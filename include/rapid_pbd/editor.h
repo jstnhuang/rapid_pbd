@@ -8,6 +8,7 @@
 #include "rapid_pbd_msgs/EditorEvent.h"
 #include "rapid_pbd_msgs/Program.h"
 #include "rapid_pbd_msgs/Step.h"
+#include "rapid_pbd_msgs/ProgramNotifier.h"
 #include "tf/transform_listener.h"
 #include "transform_graph/graph.h"
 
@@ -31,9 +32,10 @@ class Editor {
          const RobotConfig& robot_config);
   void Start();
   void HandleEvent(const rapid_pbd_msgs::EditorEvent& event);
+  bool HandleCreateProgram(rapid_pbd_msgs::ProgramNotifier::Request&, rapid_pbd_msgs::ProgramNotifier::Response&);
 
  private:
-  void Create(const std::string& name);
+  std::string Create(const std::string& name);
   void Update(const std::string& db_id, const rapid_pbd_msgs::Program& program);
   void Delete(const std::string& db_id);
   void AddStep(const std::string& db_id);

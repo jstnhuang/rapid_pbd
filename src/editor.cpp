@@ -46,9 +46,10 @@ void Editor::Start() {
 
 void Editor::HandleEvent(const msgs::EditorEvent& event) {
   try {
-    if (event.type == msgs::EditorEvent::CREATE) {
-      Create(event.program_info.name);
-    } else if (event.type == msgs::EditorEvent::UPDATE) {
+    //if (event.type == msgs::EditorEvent::CREATE) {
+    //  Create(event.program_info.name);
+    //} else if (event.type == msgs::EditorEvent::UPDATE) {
+    if (event.type == msgs::EditorEvent::UPDATE) {
       Update(event.program_info.db_id, event.program);
     } else if (event.type == msgs::EditorEvent::DELETE) {
       Delete(event.program_info.db_id);
@@ -79,7 +80,12 @@ void Editor::HandleEvent(const msgs::EditorEvent& event) {
   }
 }
 
-void Editor::Create(const std::string& name) {
+bool Editor::HandleCreateProgram(msgs::ProgramNotifier::Request& request, msgs::ProgramNotifier::Response& response) {
+  response.db_id = Create(request.name);
+  return true;
+}
+
+std::string Editor::Create(const std::string& name) {
   msgs::Program program;
   program.name = name;
   joint_state_reader_.ToMsg(&program.start_joint_state);
@@ -88,6 +94,8 @@ void Editor::Create(const std::string& name) {
   World world;
   GetWorld(robot_config_, program, 0, &world);
   viz_.Publish(id, world);
+
+  return id;
 }
 
 void Editor::Update(const std::string& db_id, const msgs::Program& program) {
