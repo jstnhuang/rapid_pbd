@@ -46,9 +46,6 @@ void Editor::Start() {
 
 void Editor::HandleEvent(const msgs::EditorEvent& event) {
   try {
-    //if (event.type == msgs::EditorEvent::CREATE) {
-    //  Create(event.program_info.name);
-    //} else if (event.type == msgs::EditorEvent::UPDATE) {
     if (event.type == msgs::EditorEvent::UPDATE) {
       Update(event.program_info.db_id, event.program);
     } else if (event.type == msgs::EditorEvent::DELETE) {
