@@ -25,7 +25,7 @@ namespace pbd {
 static const char kEditorEventsTopic[] = "editor_events";
 
 class Editor {
-public:
+ public:
   Editor(const ProgramDb &db, const SceneDb &scene_db,
          const JointStateReader &joint_state_reader,
          const Visualizer &visualizer, ActionClients *action_clients,
@@ -35,7 +35,7 @@ public:
   bool HandleCreateProgram(rapid_pbd_msgs::CreateProgram::Request &,
                            rapid_pbd_msgs::CreateProgram::Response &);
 
-private:
+ private:
   std::string Create(const std::string &name);
   void Update(const std::string &db_id, const rapid_pbd_msgs::Program &program);
   void Delete(const std::string &db_id);
@@ -88,7 +88,7 @@ private:
   tf::TransformListener tf_listener_;
   std::map<std::string, size_t> last_viewed_;
 };
-} // namespace pbd
-} // namespace rapid
+}  // namespace pbd
+}  // namespace rapid
 
-#endif // _RAPID_PBD_EDITOR_H_
+#endif  // _RAPID_PBD_EDITOR_H_

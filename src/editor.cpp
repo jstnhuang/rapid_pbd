@@ -29,9 +29,14 @@ Editor::Editor(const ProgramDb &db, const SceneDb &scene_db,
                const JointStateReader &joint_state_reader,
                const Visualizer &visualizer, ActionClients *action_clients,
                const RobotConfig &robot_config)
-    : db_(db), scene_db_(scene_db), joint_state_reader_(joint_state_reader),
-      viz_(visualizer), action_clients_(action_clients),
-      robot_config_(robot_config), tf_listener_(), last_viewed_() {}
+    : db_(db),
+      scene_db_(scene_db),
+      joint_state_reader_(joint_state_reader),
+      viz_(visualizer),
+      action_clients_(action_clients),
+      robot_config_(robot_config),
+      tf_listener_(),
+      last_viewed_() {}
 
 void Editor::Start() {
   db_.Start();
@@ -346,9 +351,10 @@ void Editor::GetPose(const std::string &db_id, size_t step_id, size_t action_id,
   }
   msgs::Step *step = &program.steps[step_id];
   if (action_id >= step->actions.size()) {
-    ROS_ERROR("Unable to get action %ld from step %ld of program \"%s\", which "
-              "has %ld actions",
-              action_id, step_id, db_id.c_str(), step->actions.size());
+    ROS_ERROR(
+        "Unable to get action %ld from step %ld of program \"%s\", which "
+        "has %ld actions",
+        action_id, step_id, db_id.c_str(), step->actions.size());
     return;
   }
 
@@ -613,5 +619,5 @@ void Editor::DeleteLandmarks(const std::string &landmark_type,
   }
   step->landmarks = cleaned;
 }
-} // namespace pbd
-} // namespace rapid
+}  // namespace pbd
+}  // namespace rapid
