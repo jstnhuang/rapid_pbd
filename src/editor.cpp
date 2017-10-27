@@ -25,10 +25,10 @@
 namespace msgs = rapid_pbd_msgs;
 namespace rapid {
 namespace pbd {
-Editor::Editor(const ProgramDb &db, const SceneDb &scene_db,
-               const JointStateReader &joint_state_reader,
-               const Visualizer &visualizer, ActionClients *action_clients,
-               const RobotConfig &robot_config)
+Editor::Editor(const ProgramDb& db, const SceneDb& scene_db,
+               const JointStateReader& joint_state_reader,
+               const Visualizer& visualizer, ActionClients* action_clients,
+               const RobotConfig& robot_config)
     : db_(db),
       scene_db_(scene_db),
       joint_state_reader_(joint_state_reader),
@@ -44,7 +44,7 @@ void Editor::Start() {
   viz_.Init();
 }
 
-void Editor::HandleEvent(const msgs::EditorEvent &event) {
+void Editor::HandleEvent(const msgs::EditorEvent& event) {
   try {
     if (event.type == msgs::EditorEvent::UPDATE) {
       Update(event.program_info.db_id, event.program);
@@ -71,19 +71,18 @@ void Editor::HandleEvent(const msgs::EditorEvent &event) {
     } else {
       ROS_ERROR("Unknown event type \"%s\"", event.type.c_str());
     }
-  } catch (const std::exception &ex) {
+  } catch (const std::exception& ex) {
     ROS_ERROR("Unhandled exception for event %s: %s", event.type.c_str(),
               ex.what());
   }
 }
 
-bool Editor::HandleCreateProgram(msgs::CreateProgram::Request &request,
-                                 msgs::CreateProgram::Response &response) {
+bool Editor::HandleCreateProgram(msgs::ProgramNotifier::Request& request, msgs::ProgramNotifier::Response& response) {
   response.db_id = Create(request.name);
   return true;
 }
 
-std::string Editor::Create(const std::string &name) {
+std::string Editor::Create(const std::string& name) {
   msgs::Program program;
   program.name = name;
   joint_state_reader_.ToMsg(&program.start_joint_state);
@@ -96,7 +95,7 @@ std::string Editor::Create(const std::string &name) {
   return id;
 }
 
-void Editor::Update(const std::string &db_id, const msgs::Program &program) {
+void Editor::Update(const std::string& db_id, const msgs::Program& program) {
   db_.Update(db_id, program);
   if (last_viewed_.find(db_id) != last_viewed_.end()) {
     World world;
@@ -107,7 +106,7 @@ void Editor::Update(const std::string &db_id, const msgs::Program &program) {
   }
 }
 
-void Editor::Delete(const std::string &db_id) {
+void Editor::Delete(const std::string& db_id) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
   if (!success) {
@@ -115,7 +114,7 @@ void Editor::Delete(const std::string &db_id) {
     return;
   }
   for (size_t i = 0; i < program.steps.size(); ++i) {
-    const msgs::Step &step = program.steps[i];
+    const msgs::Step& step = program.steps[i];
     DeleteScene(step.scene_id);
   }
 
@@ -123,7 +122,7 @@ void Editor::Delete(const std::string &db_id) {
   viz_.StopPublishing(db_id);
 }
 
-void Editor::AddStep(const std::string &db_id) {
+void Editor::AddStep(const std::string& db_id) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
   if (!success) {
@@ -135,7 +134,7 @@ void Editor::AddStep(const std::string &db_id) {
   Update(db_id, program);
 }
 
-void Editor::DeleteStep(const std::string &db_id, size_t step_id) {
+void Editor::DeleteStep(const std::string& db_id, size_t step_id) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
   if (!success) {
@@ -158,7 +157,7 @@ void Editor::DeleteStep(const std::string &db_id, size_t step_id) {
   Update(db_id, program);
 }
 
-void Editor::AddAction(const std::string &db_id, size_t step_id,
+void Editor::AddAction(const std::string& db_id, size_t step_id,
                        rapid_pbd_msgs::Action action) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
@@ -173,13 +172,13 @@ void Editor::AddAction(const std::string &db_id, size_t step_id,
         step_id, db_id.c_str(), program.steps.size());
     return;
   }
-  msgs::Step *step = &program.steps[step_id];
+  msgs::Step* step = &program.steps[step_id];
 
   step->actions.insert(step->actions.begin(), action);
   Update(db_id, program);
 }
 
-void Editor::DeleteAction(const std::string &db_id, size_t step_id,
+void Editor::DeleteAction(const std::string& db_id, size_t step_id,
                           size_t action_id) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
@@ -194,7 +193,7 @@ void Editor::DeleteAction(const std::string &db_id, size_t step_id,
         step_id, db_id.c_str(), program.steps.size());
     return;
   }
-  msgs::Step *step = &program.steps[step_id];
+  msgs::Step* step = &program.steps[step_id];
   if (action_id >= step->actions.size()) {
     ROS_ERROR(
         "Unable to delete action %ld from step %ld of program \"%s\", which "
@@ -204,7 +203,7 @@ void Editor::DeleteAction(const std::string &db_id, size_t step_id,
   }
 
   // Clean up the scene and landmarks
-  const msgs::Action &action = step->actions[action_id];
+  const msgs::Action& action = step->actions[action_id];
   if (action.type == msgs::Action::DETECT_TABLETOP_OBJECTS) {
     DeleteScene(step->scene_id);
     step->scene_id = "";
@@ -219,7 +218,7 @@ void Editor::DeleteAction(const std::string &db_id, size_t step_id,
   Update(db_id, program);
 }
 
-void Editor::ViewStep(const std::string &db_id, size_t step_id) {
+void Editor::ViewStep(const std::string& db_id, size_t step_id) {
   db_.StartPublishingProgramById(db_id);
   last_viewed_[db_id] = step_id;
 
@@ -234,7 +233,7 @@ void Editor::ViewStep(const std::string &db_id, size_t step_id) {
   viz_.Publish(db_id, world);
 }
 
-void Editor::DetectSurfaceObjects(const std::string &db_id, size_t step_id) {
+void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id) {
   msgs::SegmentSurfacesGoal goal;
   goal.save_cloud = true;
   action_clients_->surface_segmentation_client.sendGoal(goal);
@@ -263,17 +262,17 @@ void Editor::DetectSurfaceObjects(const std::string &db_id, size_t step_id) {
   DeleteScene(program.steps[step_id].scene_id);
   program.steps[step_id].scene_id = result->cloud_db_id;
   DeleteLandmarks(msgs::Landmark::SURFACE_BOX, &program.steps[step_id]);
-  for (size_t i = 0; i < result->landmarks.size(); ++i) {
+  for (size_t i=0; i<result->landmarks.size(); ++i) {
     msgs::Landmark landmark;
     ProcessSurfaceBox(result->landmarks[i], &landmark);
-    program.steps[step_id].landmarks.push_back(landmark);
+   program.steps[step_id].landmarks.push_back(landmark); 
   }
   Update(db_id, program);
 }
 
-void Editor::GetJointValues(const std::string &db_id, size_t step_id,
+void Editor::GetJointValues(const std::string& db_id, size_t step_id,
                             size_t action_id,
-                            const std::string &actuator_group) {
+                            const std::string& actuator_group) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
   if (!success) {
@@ -287,7 +286,7 @@ void Editor::GetJointValues(const std::string &db_id, size_t step_id,
         step_id, db_id.c_str(), program.steps.size());
     return;
   }
-  msgs::Step *step = &program.steps[step_id];
+  msgs::Step* step = &program.steps[step_id];
   if (action_id >= step->actions.size()) {
     ROS_ERROR(
         "Unable to update action %ld from step %ld of program \"%s\", which "
@@ -296,7 +295,7 @@ void Editor::GetJointValues(const std::string &db_id, size_t step_id,
     return;
   }
 
-  msgs::Action *action = &step->actions[action_id];
+  msgs::Action* action = &step->actions[action_id];
   action->actuator_group = actuator_group;
 
   std::vector<std::string> joint_names;
@@ -309,7 +308,7 @@ void Editor::GetJointValues(const std::string &db_id, size_t step_id,
 
   std::vector<double> joint_positions;
   for (size_t i = 0; i < joint_names.size(); ++i) {
-    const std::string &name = joint_names[i];
+    const std::string& name = joint_names[i];
     double pos = joint_state_reader_.get_position(name);
     if (pos == kNoJointValue) {
       ROS_ERROR("Could not get angle for joint \"%s\"", name.c_str());
@@ -333,9 +332,9 @@ void Editor::GetJointValues(const std::string &db_id, size_t step_id,
   Update(db_id, program);
 }
 
-void Editor::GetPose(const std::string &db_id, size_t step_id, size_t action_id,
-                     const std::string &actuator_group,
-                     const rapid_pbd_msgs::Landmark &landmark) {
+void Editor::GetPose(const std::string& db_id, size_t step_id, size_t action_id,
+                     const std::string& actuator_group,
+                     const rapid_pbd_msgs::Landmark& landmark) {
   msgs::Program program;
   bool success = db_.Get(db_id, &program);
   if (!success) {
@@ -349,7 +348,7 @@ void Editor::GetPose(const std::string &db_id, size_t step_id, size_t action_id,
         step_id, db_id.c_str(), program.steps.size());
     return;
   }
-  msgs::Step *step = &program.steps[step_id];
+  msgs::Step* step = &program.steps[step_id];
   if (action_id >= step->actions.size()) {
     ROS_ERROR(
         "Unable to get action %ld from step %ld of program \"%s\", which "
@@ -358,7 +357,7 @@ void Editor::GetPose(const std::string &db_id, size_t step_id, size_t action_id,
     return;
   }
 
-  msgs::Action *action = &step->actions[action_id];
+  msgs::Action* action = &step->actions[action_id];
   action->actuator_group = actuator_group;
 
   // If the landmark is empty or the same as before, then update the action's
@@ -382,9 +381,9 @@ void Editor::GetPose(const std::string &db_id, size_t step_id, size_t action_id,
 
 // Gets the current pose of the end-effector relative to the given landmark.
 // action.pose and action.landmark are mutated.
-void Editor::GetNewPose(const rapid_pbd_msgs::Landmark &landmark,
-                        const World &world, const std::string &actuator_group,
-                        rapid_pbd_msgs::Action *action) {
+void Editor::GetNewPose(const rapid_pbd_msgs::Landmark& landmark,
+                        const World& world, const std::string& actuator_group,
+                        rapid_pbd_msgs::Action* action) {
   // Get transform from landmark to end-effector.
   transform_graph::Graph graph;
 
@@ -477,7 +476,7 @@ void Editor::GetNewPose(const rapid_pbd_msgs::Landmark &landmark,
 
   std::vector<double> joint_positions;
   for (size_t i = 0; i < joint_names.size(); ++i) {
-    const std::string &name = joint_names[i];
+    const std::string& name = joint_names[i];
     double pos = joint_state_reader_.get_position(name);
     if (pos == kNoJointValue) {
       ROS_ERROR("Could not get angle for joint \"%s\"", name.c_str());
@@ -493,8 +492,8 @@ void Editor::GetNewPose(const rapid_pbd_msgs::Landmark &landmark,
 // Reinterpret the existing pose to be relative to the given landmark.
 // Assumes as a precondition that action->pose is not empty.
 // action->pose and action->landmark are mutated.
-void Editor::ReinterpretPose(const rapid_pbd_msgs::Landmark &new_landmark,
-                             rapid_pbd_msgs::Action *action) {
+void Editor::ReinterpretPose(const rapid_pbd_msgs::Landmark& new_landmark,
+                             rapid_pbd_msgs::Action* action) {
   transform_graph::Graph graph;
   graph.Add("end effector", transform_graph::RefFrame("old landmark"),
             action->pose);
@@ -572,14 +571,14 @@ void Editor::ReinterpretPose(const rapid_pbd_msgs::Landmark &new_landmark,
   ee_in_new_landmark.ToPose(&action->pose);
 }
 
-bool Editor::ClosestLandmark(const geometry_msgs::Vector3 &ee_position,
-                             const World &world,
+bool Editor::ClosestLandmark(const geometry_msgs::Vector3& ee_position,
+                             const World& world,
                              const double squared_distance_cutoff,
-                             rapid_pbd_msgs::Landmark *landmark) {
+                             rapid_pbd_msgs::Landmark* landmark) {
   bool success = false;
   double closest_distance = std::numeric_limits<double>::max();
   for (size_t i = 0; i < world.surface_box_landmarks.size(); ++i) {
-    const msgs::Landmark &world_landmark = world.surface_box_landmarks[i];
+    const msgs::Landmark& world_landmark = world.surface_box_landmarks[i];
     geometry_msgs::Vector3 world_pos;
     world_pos.x = world_landmark.pose_stamped.pose.position.x;
     world_pos.y = world_landmark.pose_stamped.pose.position.y;
@@ -598,7 +597,7 @@ bool Editor::ClosestLandmark(const geometry_msgs::Vector3 &ee_position,
   return success;
 }
 
-void Editor::DeleteScene(const std::string &scene_id) {
+void Editor::DeleteScene(const std::string& scene_id) {
   if (scene_id == "") {
     return;
   }
@@ -608,11 +607,11 @@ void Editor::DeleteScene(const std::string &scene_id) {
   }
 }
 
-void Editor::DeleteLandmarks(const std::string &landmark_type,
-                             rapid_pbd_msgs::Step *step) {
+void Editor::DeleteLandmarks(const std::string& landmark_type,
+                             rapid_pbd_msgs::Step* step) {
   std::vector<msgs::Landmark> cleaned;
   for (size_t i = 0; i < step->landmarks.size(); ++i) {
-    const msgs::Landmark &landmark = step->landmarks[i];
+    const msgs::Landmark& landmark = step->landmarks[i];
     if (landmark.type != landmark_type) {
       cleaned.push_back(landmark);
     }
