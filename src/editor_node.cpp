@@ -14,7 +14,7 @@
 
 namespace pbd = rapid::pbd;
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   ros::init(argc, argv, "rapid_pbd_editor_node");
   ros::NodeHandle nh;
 
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  pbd::RobotConfig* robot_config;
+  pbd::RobotConfig *robot_config;
   if (robot == "pr2") {
     robot_config = new pbd::Pr2RobotConfig();
   } else if (robot == "fetch") {
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
   // Build program DB.
   mongodb_store::MessageStoreProxy proxy(nh, pbd::kMongoProgramCollectionName,
                                          pbd::kMongoDbName);
-  mongodb_store::MessageStoreProxy* scene_proxy =
+  mongodb_store::MessageStoreProxy *scene_proxy =
       new mongodb_store::MessageStoreProxy(nh, pbd::kMongoSceneCollectionName,
                                            pbd::kMongoDbName);
   ros::Publisher program_list_pub =
@@ -73,7 +73,8 @@ int main(int argc, char** argv) {
   ros::Subscriber editor_sub = nh.subscribe(pbd::kEditorEventsTopic, 10,
                                             &pbd::Editor::HandleEvent, &editor);
 
-  ros::ServiceServer editor_server = nh.advertiseService("program_creation_notifier", &pbd::Editor::HandleCreateProgram, &editor);
+  ros::ServiceServer editor_server = nh.advertiseService(
+      "create_program", &pbd::Editor::HandleCreateProgram, &editor);
 
   ROS_INFO("RapidPBD editor ready.");
   ros::spin();

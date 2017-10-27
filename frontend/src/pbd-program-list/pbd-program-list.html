@@ -51,9 +51,9 @@
       id="createSrv"
       on-fail="_handleServiceError"
       on-response="_handleServiceResponse"
-      name="/rapid_pbd/program_creation_notifier"
+      name="/rapid_pbd/create_program"
       ros="[[ros]]"
-      service-type="rapid_pbd_msgs/ProgramNotifier"
+      service-type="rapid_pbd_msgs/CreateProgram"
     ></ros-service>
     <paper-button id="createButton" class="important" raised on-tap="_handleCreate">+ Create new program</paper-button>
     <div class="paper-material">
@@ -118,7 +118,6 @@
       },
 
       _handleCreate: function(evt) {
-        var routeData = this.$.routeData;
         var now = new Date();
         var name = 'Untitled program ' + now.toLocaleString();
         var request = {
@@ -129,11 +128,12 @@
 
       _handleServiceResponse(evt) {
         var id = evt.detail.db_id;
-        window.location.replace("#/program/" + id);
+        window.history.pushState({}, null, "#/program/" + id);
+        window.dispatchEvent(new CustomEvent("location-changed"));
       },
 
       _handleServiceError: function(evt) {
-        console.log(evt.detail);
+        console.error(evt.detail);
       },
     });
   </script>
