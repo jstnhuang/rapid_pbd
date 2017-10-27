@@ -5,10 +5,10 @@
 #include <vector>
 
 #include "rapid_pbd_msgs/Action.h"
+#include "rapid_pbd_msgs/CreateProgram.h"
 #include "rapid_pbd_msgs/EditorEvent.h"
 #include "rapid_pbd_msgs/Program.h"
 #include "rapid_pbd_msgs/Step.h"
-#include "rapid_pbd_msgs/ProgramNotifier.h"
 #include "tf/transform_listener.h"
 #include "transform_graph/graph.h"
 
@@ -32,7 +32,8 @@ class Editor {
          const RobotConfig& robot_config);
   void Start();
   void HandleEvent(const rapid_pbd_msgs::EditorEvent& event);
-  bool HandleCreateProgram(rapid_pbd_msgs::ProgramNotifier::Request&, rapid_pbd_msgs::ProgramNotifier::Response&);
+  bool HandleCreateProgram(rapid_pbd_msgs::CreateProgram::Request&,
+                           rapid_pbd_msgs::CreateProgram::Response&);
 
  private:
   std::string Create(const std::string& name);

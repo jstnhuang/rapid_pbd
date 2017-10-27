@@ -77,7 +77,8 @@ void Editor::HandleEvent(const msgs::EditorEvent& event) {
   }
 }
 
-bool Editor::HandleCreateProgram(msgs::ProgramNotifier::Request& request, msgs::ProgramNotifier::Response& response) {
+bool Editor::HandleCreateProgram(msgs::CreateProgram::Request& request,
+                                 msgs::CreateProgram::Response& response) {
   response.db_id = Create(request.name);
   return true;
 }
@@ -262,10 +263,10 @@ void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id) {
   DeleteScene(program.steps[step_id].scene_id);
   program.steps[step_id].scene_id = result->cloud_db_id;
   DeleteLandmarks(msgs::Landmark::SURFACE_BOX, &program.steps[step_id]);
-  for (size_t i=0; i<result->landmarks.size(); ++i) {
+  for (size_t i = 0; i < result->landmarks.size(); ++i) {
     msgs::Landmark landmark;
     ProcessSurfaceBox(result->landmarks[i], &landmark);
-   program.steps[step_id].landmarks.push_back(landmark); 
+    program.steps[step_id].landmarks.push_back(landmark);
   }
   Update(db_id, program);
 }
