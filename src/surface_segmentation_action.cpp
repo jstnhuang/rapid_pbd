@@ -175,6 +175,24 @@ void SurfaceSegmentationAction::Execute(
   for (size_t i = 0; i < surface_objects.size(); ++i) {
     const SurfaceObjects& surface_scene = surface_objects[i];
     num_objects += surface_scene.objects.size();
+
+    shape_msgs::SolidPrimitive surface_shape;
+    surface_shape.type = shape_msgs::SolidPrimitive::BOX;
+    surface_shape.dimensions.resize(3);
+    surface_shape.dimensions[0] = surface_objects[i].surface.dimensions.x;
+    surface_shape.dimensions[1] = surface_objects[i].surface.dimensions.y;
+    surface_shape.dimensions[2] = surface_objects[i].surface.dimensions.z;
+
+    moveit_msgs::CollisionObject surface;
+    surface.header.frame_id = robot_config_.base_link();
+    std::stringstream ss;
+    ss << "surface_segmentation_collision_object" << i;
+    surface.id = ss.str();
+    surface.primitives.push_back(surface_shape);
+    surface.primitive_poses.push_back(surface_objects[i].surface.pose_stamped.pose);
+    surface.operation = moveit_msgs::CollisionObject::ADD;
+    result.surfaces.push_back(surface);
+
     for (size_t j = 0; j < surface_scene.objects.size(); ++j) {
       const Object& object = surface_scene.objects[j];
       size_t cloud_size = object.indices->indices.size();
