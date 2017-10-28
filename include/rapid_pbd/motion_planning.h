@@ -38,6 +38,7 @@ class MotionPlanning {
   void ClearGoals();
   void BuildGoal(moveit_msgs::MoveGroupGoal* goal) const;
   int num_goals() const;
+  void publishCollisionObject(moveit_msgs::CollisionObject&);
 
  private:
   const RobotConfig& robot_config_;
