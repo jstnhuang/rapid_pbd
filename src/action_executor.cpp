@@ -144,6 +144,11 @@ bool ActionExecutor::IsDone(std::string* error) const {
           world_->surface_box_landmarks.push_back(landmark);
         }
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
+
+	for (size_t i=0; i<result->surfaces.size(); ++i) {
+	  moveit_msgs::CollisionObject surface = result->surfaces[i];
+	  motion_planning_->publishCollisionObject(surface);
+	}
       } else {
         ROS_ERROR("Surface segmentation result pointer was null!");
         *error = "Surface segmentation result pointer was null!";
