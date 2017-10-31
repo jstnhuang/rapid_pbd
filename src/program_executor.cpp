@@ -144,6 +144,17 @@ void ProgramExecutionServer::Execute(
       return;
     }
   }
+
+  moveit_msgs::CollisionObject surface;
+  surface.header.frame_id = robot_config_.base_link();
+  surface.id = "surface_segmentation_collision_table";
+  surface.operation = moveit_msgs::CollisionObject::REMOVE;
+
+  moveit_msgs::PlanningScene scene;
+  scene.world.collision_objects.push_back(surface);
+  scene.is_diff = true;
+  planning_scene_pub_.publish(scene);
+
   PublishIsRunning(false);
   server_.setSucceeded();
 }

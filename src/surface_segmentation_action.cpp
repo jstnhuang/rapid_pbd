@@ -24,8 +24,8 @@
 #include "rapid_pbd/program_db.h"
 #include "rapid_pbd/robot_config.h"
 
-using surface_perception::SurfaceObjects;
 using surface_perception::Object;
+using surface_perception::SurfaceObjects;
 
 namespace rapid {
 namespace pbd {
@@ -185,11 +185,10 @@ void SurfaceSegmentationAction::Execute(
 
     moveit_msgs::CollisionObject surface;
     surface.header.frame_id = robot_config_.base_link();
-    std::stringstream ss;
-    ss << "surface_segmentation_collision_object" << i;
-    surface.id = ss.str();
+    surface.id = "surface_segmentation_collision_table";
     surface.primitives.push_back(surface_shape);
-    surface.primitive_poses.push_back(surface_objects[i].surface.pose_stamped.pose);
+    surface.primitive_poses.push_back(
+        surface_objects[i].surface.pose_stamped.pose);
     surface.operation = moveit_msgs::CollisionObject::ADD;
     result.surfaces.push_back(surface);
 
