@@ -150,6 +150,7 @@ bool ActionExecutor::IsDone(std::string* error) const {
 
         msgs::Surface surface = result->surface;
         shape_msgs::SolidPrimitive surface_shape;
+        surface_shape.type = shape_msgs::SolidPrimitive::BOX;
         surface_shape.dimensions.resize(3);
         surface_shape.dimensions[0] = surface.dimensions.x;
         surface_shape.dimensions[1] = surface.dimensions.y;
