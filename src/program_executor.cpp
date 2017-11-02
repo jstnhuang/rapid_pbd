@@ -141,7 +141,7 @@ void ProgramExecutionServer::Execute(
   }
 
   moveit_msgs::CollisionObject surface;
-  surface.header.frame_id = robot_config_.base_link();
+  surface.header.frame_id = robot_state_.config.base_link();
   surface.id = "surface_segmentation_collision_table";
   surface.operation = moveit_msgs::CollisionObject::REMOVE;
 

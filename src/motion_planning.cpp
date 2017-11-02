@@ -272,7 +272,7 @@ std::string ErrorCodeToString(const MoveItErrorCodes& code) {
   return ss.str();
 }
 
-void MotionPlanning::publishCollisionObject(moveit_msgs::CollisionObject& obj) {
+void MotionPlanning::PublishCollisionObject(moveit_msgs::CollisionObject& obj) {
   moveit_msgs::PlanningScene scene;
   scene.world.collision_objects.push_back(obj);
   scene.is_diff = true;

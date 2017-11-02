@@ -15,6 +15,7 @@
 #include "rapid_pbd/errors.h"
 #include "rapid_pbd/landmarks.h"
 #include "rapid_pbd/motion_planning.h"
+#include "rapid_pbd/motion_planning_constants.h"
 #include "rapid_pbd/visualizer.h"
 #include "rapid_pbd/world.h"
 
@@ -147,10 +148,20 @@ bool ActionExecutor::IsDone(std::string* error) const {
         }
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
 
-        for (size_t i = 0; i < result->surfaces.size(); ++i) {
-          moveit_msgs::CollisionObject surface = result->surfaces[i];
-          motion_planning_->publishCollisionObject(surface);
-        }
+        msgs::Surface surface = result->surface;
+        shape_msgs::SolidPrimitive surface_shape;
+        surface_shape.dimensions.resize(3);
+        surface_shape.dimensions[0] = surface.dimensions.x;
+        surface_shape.dimensions[1] = surface.dimensions.y;
+        surface_shape.dimensions[2] = surface.dimensions.z;
+
+        moveit_msgs::CollisionObject surface_obj;
+        surface_obj.header.frame_id = robot_config_.base_link();
+        surface_obj.id = kCollisionSurfaceName;
+        surface_obj.primitives.push_back(surface_shape);
+        surface_obj.primitive_poses.push_back(surface.pose_stamped.pose);
+        surface_obj.operation = moveit_msgs::CollisionObject::ADD;
+        motion_planning_->PublishCollisionObject(surface_obj);
       } else {
         ROS_ERROR("Surface segmentation result pointer was null!");
         *error = "Surface segmentation result pointer was null!";
