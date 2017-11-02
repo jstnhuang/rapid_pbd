@@ -15,6 +15,7 @@
 #include "rapid_pbd/step_executor.h"
 #include "rapid_pbd/visualizer.h"
 #include "rapid_pbd/world.h"
+#include "rapid_pbd/motion_planning_constants.h"
 
 using rapid_pbd_msgs::Action;
 using rapid_pbd_msgs::ExecuteProgramFeedback;
@@ -141,8 +142,7 @@ void ProgramExecutionServer::Execute(
   }
 
   moveit_msgs::CollisionObject surface;
-  surface.header.frame_id = robot_state_.config.base_link();
-  surface.id = "surface_segmentation_collision_table";
+  surface.id = kCollisionSurfaceName;
   surface.operation = moveit_msgs::CollisionObject::REMOVE;
 
   moveit_msgs::PlanningScene scene;

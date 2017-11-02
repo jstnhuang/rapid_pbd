@@ -156,7 +156,7 @@ bool ActionExecutor::IsDone(std::string* error) const {
         surface_shape.dimensions[2] = surface.dimensions.z;
 
         moveit_msgs::CollisionObject surface_obj;
-        surface_obj.header.frame_id = robot_config_.base_link();
+        surface_obj.header.frame_id = surface.pose_stamped.header.frame_id;
         surface_obj.id = kCollisionSurfaceName;
         surface_obj.primitives.push_back(surface_shape);
         surface_obj.primitive_poses.push_back(surface.pose_stamped.pose);
