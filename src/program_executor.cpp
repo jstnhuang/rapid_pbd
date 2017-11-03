@@ -56,6 +56,7 @@ void ProgramExecutionServer::Execute(
     if (!success) {
       std::string error("Unable to find program with db_id: " + goal->db_id);
       Cancel(error);
+      Finish();
       ros::spinOnce();
       return;
     }
@@ -64,6 +65,7 @@ void ProgramExecutionServer::Execute(
     if (!success) {
       std::string error("Unable to find program with name: " + goal->name);
       Cancel(error);
+      Finish();
       ros::spinOnce();
       return;
     }
@@ -115,6 +117,7 @@ void ProgramExecutionServer::Execute(
     if (error != "") {
       executors[i]->Cancel();
       Cancel(error);
+      Finish();
       ros::spinOnce();
       return;
     }
@@ -123,12 +126,14 @@ void ProgramExecutionServer::Execute(
         executors[i]->Cancel();
         std::string msg("Program \"" + program.name + "\" was preempted.");
         Cancel(msg);
+        Finish();
         ros::spinOnce();
         return;
       }
       if (error != "") {
         executors[i]->Cancel();
         Cancel(error);
+        Finish();
         ros::spinOnce();
         return;
       }
@@ -136,21 +141,13 @@ void ProgramExecutionServer::Execute(
     }
     if (error != "") {
       Cancel(error);
+      Finish();
       ros::spinOnce();
       return;
     }
   }
 
-  moveit_msgs::CollisionObject surface;
-  surface.id = kCollisionSurfaceName;
-  surface.operation = moveit_msgs::CollisionObject::REMOVE;
-
-  moveit_msgs::PlanningScene scene;
-  scene.world.collision_objects.push_back(surface);
-  scene.is_diff = true;
-  planning_scene_pub_.publish(scene);
-
-  PublishIsRunning(false);
+  Finish();
   server_.setSucceeded();
 }
 
@@ -174,6 +171,18 @@ void ProgramExecutionServer::Cancel(const std::string& error) {
   ExecuteProgramResult result;
   result.error = error;
   server_.setAborted(result, error);
+}
+
+void ProgramExecutionServer::Finish() {
+  moveit_msgs::CollisionObject surface;
+  surface.id = kCollisionSurfaceName;
+  surface.operation = moveit_msgs::CollisionObject::REMOVE;
+
+  moveit_msgs::PlanningScene scene;
+  scene.world.collision_objects.push_back(surface);
+  scene.is_diff = true;
+  planning_scene_pub_.publish(scene);
+
   PublishIsRunning(false);
 }
 }  // namespace pbd
