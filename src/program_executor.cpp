@@ -10,12 +10,12 @@
 #include "std_msgs/Bool.h"
 
 #include "rapid_pbd/action_names.h"
+#include "rapid_pbd/motion_planning_constants.h"
 #include "rapid_pbd/program_db.h"
 #include "rapid_pbd/runtime_robot_state.h"
 #include "rapid_pbd/step_executor.h"
 #include "rapid_pbd/visualizer.h"
 #include "rapid_pbd/world.h"
-#include "rapid_pbd/motion_planning_constants.h"
 
 using rapid_pbd_msgs::Action;
 using rapid_pbd_msgs::ExecuteProgramFeedback;
