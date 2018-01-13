@@ -148,21 +148,23 @@ bool ActionExecutor::IsDone(std::string* error) const {
         }
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
 
-        msgs::Surface surface = result->surface;
-        shape_msgs::SolidPrimitive surface_shape;
-        surface_shape.type = shape_msgs::SolidPrimitive::BOX;
-        surface_shape.dimensions.resize(3);
-        surface_shape.dimensions[0] = surface.dimensions.x;
-        surface_shape.dimensions[1] = surface.dimensions.y;
-        surface_shape.dimensions[2] = surface.dimensions.z;
-
-        moveit_msgs::CollisionObject surface_obj;
-        surface_obj.header.frame_id = surface.pose_stamped.header.frame_id;
-        surface_obj.id = kCollisionSurfaceName;
-        surface_obj.primitives.push_back(surface_shape);
-        surface_obj.primitive_poses.push_back(surface.pose_stamped.pose);
-        surface_obj.operation = moveit_msgs::CollisionObject::ADD;
-        motion_planning_->PublishCollisionObject(surface_obj);
+        std::vector<msgs::Surface> surfaces = result->surfaces;
+        for (size_t i = 0; i < surfaces.size(); ++i) {
+          shape_msgs::SolidPrimitive surface_shape;
+          surface_shape.type = shape_msgs::SolidPrimitive::BOX;
+          surface_shape.dimensions.resize(3);
+          surface_shape.dimensions[0] = surfaces[i].dimensions.x;
+          surface_shape.dimensions[1] = surfaces[i].dimensions.y;
+          surface_shape.dimensions[2] = surfaces[i].dimensions.z;
+  
+          moveit_msgs::CollisionObject surface_obj;
+          surface_obj.header.frame_id = surfaces[i].pose_stamped.header.frame_id;
+          surface_obj.id = kCollisionSurfaceName;
+          surface_obj.primitives.push_back(surface_shape);
+          surface_obj.primitive_poses.push_back(surfaces[i].pose_stamped.pose);
+          surface_obj.operation = moveit_msgs::CollisionObject::ADD;
+          motion_planning_->PublishCollisionObject(surface_obj);
+        }
       } else {
         ROS_ERROR("Surface segmentation result pointer was null!");
         *error = "Surface segmentation result pointer was null!";

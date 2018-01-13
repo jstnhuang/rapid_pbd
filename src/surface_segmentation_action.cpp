@@ -180,7 +180,7 @@ void SurfaceSegmentationAction::Execute(
       rapid_pbd_msgs::Surface surface;
       surface.dimensions = surface_objects[i].surface.dimensions;
       surface.pose_stamped = surface_objects[i].surface.pose_stamped;
-      result.surface = surface;
+      result.surfaces.push_back(surface);
     }
 
     for (size_t j = 0; j < surface_scene.objects.size(); ++j) {
