@@ -108,7 +108,7 @@ void SurfaceSegmentationAction::Execute(
   ros::param::param<double>("crop_min_x", min_x, -1);
   ros::param::param<double>("crop_min_y", min_y, -1);
   ros::param::param<double>("crop_min_z", min_z, 0.1);
-  ros::param::param<double>("crop_max_x", max_x, 1);
+  ros::param::param<double>("crop_max_x", max_x, 2.0);
   ros::param::param<double>("crop_max_y", max_y, 1);
   ros::param::param<double>("crop_max_z", max_z, 1.5);
   pcl::PointIndices::Ptr point_indices(new pcl::PointIndices);
@@ -159,7 +159,7 @@ void SurfaceSegmentationAction::Execute(
   seg.set_max_cluster_size(max_cluster_size);
 
   std::vector<surface_perception::SurfaceObjects> surface_objects;
-  bool success = seg.Segment(&surface_objects);
+  bool success = seg.Segments(&surface_objects);
 
   if (!success) {
     ROS_ERROR("Failed to perceive surface objects.");
