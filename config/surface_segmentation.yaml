@@ -1,6 +1,6 @@
 # Scene cropping
 crop_min_x: 0
-crop_max_x: 1
+crop_max_x: 2
 crop_min_y: -1.0
 crop_max_y: 1.0
 crop_min_z: 0.1
