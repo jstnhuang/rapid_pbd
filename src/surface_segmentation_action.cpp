@@ -159,7 +159,7 @@ void SurfaceSegmentationAction::Execute(
   seg.set_max_cluster_size(max_cluster_size);
 
   std::vector<surface_perception::SurfaceObjects> surface_objects;
-  bool success = seg.Segments(&surface_objects);
+  bool success = seg.Segment(&surface_objects);
 
   if (!success) {
     ROS_ERROR("Failed to perceive surface objects.");
