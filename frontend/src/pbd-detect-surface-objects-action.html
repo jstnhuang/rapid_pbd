@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/ros-topic/ros-topic.html">
+<link rel="import" href="../bower_components/ros-param/ros-param.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="pbd-detect-surface-objects-action">
@@ -20,8 +21,48 @@
       topic="rapid_pbd/editor_events"
       ros="[[ros]]"
     ></ros-topic>
+
+    <ros-param
+      ros="[[ros]]"
+      id="crop_min_x"
+      name="rapid_pbd/crop_min_x"
+      string-val="{{val1}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="crop_max_x"
+      name="rapid_pbd/crop_max_x"
+      string-val="{{val2}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="crop_max_y"
+      name="rapid_pbd/crop_min_y"
+      string-val="{{val3}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="crop_max_y"
+      name="rapid_pbd/crop_max_y"
+      string-val="{{val4}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="crop_min_z"
+      name="rapid_pbd/crop_min_z"
+      string-val="{{val5}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="crop_max_z"
+      name="rapid_pbd/crop_max_z"
+      string-val="{{val6}}"
+    ></ros-param>
+
     <p>Detected objects can be used as landmarks starting on the next step.</p>
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
+    <paper-button class="normal" on-tap="click1">Param1</paper-button>
+    <paper-button class="normal" on-tap="click2">Param2</paper-button>
   </template>
   <script>
     Polymer({
@@ -50,6 +91,14 @@
           step_num: this.stepNum
         };
         this.$.eventPub.publish(msg);
+      },
+
+      click1: function() {
+        this.$.param1.set("hello1");
+      },
+
+      click2: function() {
+        this.$.param2.set("hello2");
       }
     });
   </script>
