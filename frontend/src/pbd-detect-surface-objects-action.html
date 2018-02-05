@@ -26,43 +26,72 @@
       ros="[[ros]]"
       id="crop_min_x"
       name="rapid_pbd/crop_min_x"
-      string-val="{{val1}}"
+      string-val="{{crop_min_x_val}}"
     ></ros-param>
     <ros-param
       ros="[[ros]]"
       id="crop_max_x"
       name="rapid_pbd/crop_max_x"
-      string-val="{{val2}}"
+      string-val="{{crop_max_x_val}}"
     ></ros-param>
     <ros-param
       ros="[[ros]]"
       id="crop_max_y"
       name="rapid_pbd/crop_min_y"
-      string-val="{{val3}}"
+      string-val="{{crop_min_y_val}}"
     ></ros-param>
     <ros-param
       ros="[[ros]]"
       id="crop_max_y"
       name="rapid_pbd/crop_max_y"
-      string-val="{{val4}}"
+      string-val="{{crop_max_y_val}}"
     ></ros-param>
     <ros-param
       ros="[[ros]]"
       id="crop_min_z"
       name="rapid_pbd/crop_min_z"
-      string-val="{{val5}}"
+      string-val="{{crop_min_z_val}}"
     ></ros-param>
     <ros-param
       ros="[[ros]]"
       id="crop_max_z"
       name="rapid_pbd/crop_max_z"
-      string-val="{{val6}}"
+      string-val="{{crop_max_z_val}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="horizontal_tolerance_degrees"
+      name="rapid_pbd/horizontal_tolerance_degrees"
+      string-val="{{horizontal_tolerance_degrees_val}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="margin_above_surface"
+      name="rapid_pbd/margin_above_surface"
+      string-val="{{margin_above_surface_val}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="cluster_distance"
+      name="rapid_pbd/cluster_distance"
+      string-val="{{cluster_distance}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="min_cluster_size"
+      name="rapid_pbd/min_cluster_size"
+      string-val="{{min_cluster_size_val}}"
+    ></ros-param>
+    <ros-param
+      ros="[[ros]]"
+      id="max_cluster_size"
+      name="rapid_pbd/max_cluster_size"
+      string-val="{{max_cluster_size_val}}"
     ></ros-param>
 
     <p>Detected objects can be used as landmarks starting on the next step.</p>
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
-    <paper-button class="normal" on-tap="click1">Param1</paper-button>
-    <paper-button class="normal" on-tap="click2">Param2</paper-button>
+    <paper-input label="crop_min_x" value="{{crop_min_x_val}}"></paper-input>
   </template>
   <script>
     Polymer({
@@ -92,14 +121,6 @@
         };
         this.$.eventPub.publish(msg);
       },
-
-      click1: function() {
-        this.$.param1.set("hello1");
-      },
-
-      click2: function() {
-        this.$.param2.set("hello2");
-      }
     });
   </script>
 </dom-module>
