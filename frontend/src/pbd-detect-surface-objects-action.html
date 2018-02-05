@@ -74,7 +74,7 @@
       ros="[[ros]]"
       id="cluster_distance"
       name="rapid_pbd/cluster_distance"
-      string-val="{{cluster_distance}}"
+      string-val="{{cluster_distance_val}}"
     ></ros-param>
     <ros-param
       ros="[[ros]]"
@@ -92,6 +92,15 @@
     <p>Detected objects can be used as landmarks starting on the next step.</p>
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
     <paper-input label="crop_min_x" value="{{crop_min_x_val}}"></paper-input>
+    <paper-input label="crop_max_x" value="{{crop_max_x_val}}"></paper-input>
+    <paper-input label="crop_min_y" value="{{crop_min_y_val}}"></paper-input>
+    <paper-input label="crop_max_y" value="{{crop_max_y_val}}"></paper-input>
+    <paper-input label="crop_min_z" value="{{crop_min_z_val}}"></paper-input>
+    <paper-input label="crop_max_z" value="{{crop_max_z_val}}"></paper-input>
+    <paper-input label="horizontal_tolerance_degrees" value="{{horizontal_tolerance_degrees_val}}"></paper-input>
+    <paper-input label="cluster_distance" value="{{cluster_distance_val}}"></paper-input>
+    <paper-input label="min_cluster_size" value="{{min_cluster_size_val}}"></paper-input>
+    <paper-input label="max_cluster_size" value="{{max_cluster_size_val}}"></paper-input>
   </template>
   <script>
     Polymer({
