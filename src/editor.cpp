@@ -61,7 +61,7 @@ void Editor::HandleEvent(const msgs::EditorEvent& event) {
     } else if (event.type == msgs::EditorEvent::VIEW_STEP) {
       ViewStep(event.program_info.db_id, event.step_num);
     } else if (event.type == msgs::EditorEvent::DETECT_SURFACE_OBJECTS) {
-      DetectSurfaceObjects(event.program_info.db_id, event.step_num);
+      DetectSurfaceObjects(event.program_info.db_id, event.step_num, event.param_list);
     } else if (event.type == msgs::EditorEvent::GET_JOINT_VALUES) {
       GetJointValues(event.program_info.db_id, event.step_num, event.action_num,
                      event.action.actuator_group);
@@ -234,7 +234,11 @@ void Editor::ViewStep(const std::string& db_id, size_t step_id) {
   viz_.Publish(db_id, world);
 }
 
-void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id) {
+void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id, const std::vector<msgs::DetectionParam>& param_list) {
+  for (size_t i = 0; i < param_list.size(); i++) {
+    ROS_INFO("Seeing %s with %f", param_list[i].name.c_str(), param_list[i].value);
+  }
+
   msgs::SegmentSurfacesGoal goal;
   goal.save_cloud = true;
   action_clients_->surface_segmentation_client.sendGoal(goal);

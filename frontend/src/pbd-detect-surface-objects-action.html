@@ -61,7 +61,7 @@
         for (i = 0; i < inputLst.length; i++) {
           paramLst[paramLst.length] = {
             name: "/rapid_pbd/" + inputLst[i].label,
-            value: inputLst[i].value
+            value: parseFloat(inputLst[i].value)
           }
         }
 
