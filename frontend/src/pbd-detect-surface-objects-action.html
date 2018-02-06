@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/ros-topic/ros-topic.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="pbd-detect-surface-objects-action">
@@ -14,6 +14,10 @@
       paper-button {
         margin-left: 10px;
       }
+      div > p {
+        padding: 0px 0px 0px 0px;
+        margin-bottom: 0px;
+      }
     </style>
     <ros-topic auto
       id="eventPub"
@@ -24,16 +28,19 @@
 
     <p>Detected objects can be used as landmarks starting on the next step.</p>
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
-    <paper-input class="normal input" label="crop_min_x" value="0.0" input_type="float"></paper-input>
-    <paper-input class="normal input" label="crop_max_x" value="1.5" input_type="float"></paper-input>
-    <paper-input class="normal input" label="crop_min_y" value="-0.5" input_type="float"></paper-input>
-    <paper-input class="normal input" label="crop_max_y" value="0.5" input_type="float"></paper-input>
-    <paper-input class="normal input" label="crop_min_z" value="0.05" input_type="float"></paper-input>
-    <paper-input class="normal input" label="crop_max_z" value="1.5" input_type="float"></paper-input>
-    <paper-input class="normal input" label="horizontal_tolerance_degrees" value="10.0" input_type="float"></paper-input>
-    <paper-input class="normal input" label="cluster_distance" value="0.025" input_type="float"></paper-input>
-    <paper-input class="normal input" label="min_cluster_size" value="300" input_type="int"></paper-input>
-    <paper-input class="normal input" label="max_cluster_size" value="2000" input_type="int"></paper-input>
+    <div>
+      <p>crop_min_x</p>
+      <paper-slider class="normal" pin name="crop_min_x" value="0.0" input_type="float"></paper-slider>
+    </div>
+    <paper-slider class="normal" pin name="crop_max_x" value="1.5" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="crop_min_y" value="-0.5" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="crop_max_y" value="0.5" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="crop_min_z" value="0.05" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="crop_max_z" value="1.5" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="horizontal_tolerance_degrees" value="10.0" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="cluster_distance" value="0.025" input_type="float"></paper-slider>
+    <paper-slider class="normal" pin name="min_cluster_size" value="300" input_type="int"></paper-slider>
+    <paper-slider class="normal" pin name="max_cluster_size" value="2000" input_type="int"></paper-slider>
   </template>
   <script>
     Polymer({
@@ -56,7 +63,7 @@
         }
 
         var paramLst = [];
-        var inputLst = Polymer.dom(this.root).querySelectorAll("paper-input");
+        var inputLst = Polymer.dom(this.root).querySelectorAll("paper-slider");
 
         for (i = 0; i < inputLst.length; i++) {
           var value = -1;
@@ -67,11 +74,11 @@
           } else if (type == "int") {
             value = parseInt(inputLst[i].value);
           } else {
-            value = inputLst[i].value;
+            console.error("The value type" + type + " is not supported for rosparam manipulation");
           }
 
           paramLst[paramLst.length] = {
-            name: "/rapid_pbd/" + inputLst[i].label,
+            name: "/rapid_pbd/" + inputLst[i].name,
             value: value,
             type: type
           }
