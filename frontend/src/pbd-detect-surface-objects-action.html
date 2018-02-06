@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/ros-topic/ros-topic.html">
-<link rel="import" href="../bower_components/ros-param/ros-param.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="pbd-detect-surface-objects-action">
@@ -22,85 +22,18 @@
       ros="[[ros]]"
     ></ros-topic>
 
-    <ros-param
-      ros="[[ros]]"
-      id="crop_min_x"
-      name="rapid_pbd/crop_min_x"
-      string-val="{{crop_min_x_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="crop_max_x"
-      name="rapid_pbd/crop_max_x"
-      string-val="{{crop_max_x_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="crop_max_y"
-      name="rapid_pbd/crop_min_y"
-      string-val="{{crop_min_y_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="crop_max_y"
-      name="rapid_pbd/crop_max_y"
-      string-val="{{crop_max_y_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="crop_min_z"
-      name="rapid_pbd/crop_min_z"
-      string-val="{{crop_min_z_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="crop_max_z"
-      name="rapid_pbd/crop_max_z"
-      string-val="{{crop_max_z_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="horizontal_tolerance_degrees"
-      name="rapid_pbd/horizontal_tolerance_degrees"
-      string-val="{{horizontal_tolerance_degrees_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="margin_above_surface"
-      name="rapid_pbd/margin_above_surface"
-      string-val="{{margin_above_surface_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="cluster_distance"
-      name="rapid_pbd/cluster_distance"
-      string-val="{{cluster_distance_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="min_cluster_size"
-      name="rapid_pbd/min_cluster_size"
-      string-val="{{min_cluster_size_val}}"
-    ></ros-param>
-    <ros-param
-      ros="[[ros]]"
-      id="max_cluster_size"
-      name="rapid_pbd/max_cluster_size"
-      string-val="{{max_cluster_size_val}}"
-    ></ros-param>
-
     <p>Detected objects can be used as landmarks starting on the next step.</p>
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
-    <paper-input label="crop_min_x" value="{{crop_min_x_val}}"></paper-input>
-    <paper-input label="crop_max_x" value="{{crop_max_x_val}}"></paper-input>
-    <paper-input label="crop_min_y" value="{{crop_min_y_val}}"></paper-input>
-    <paper-input label="crop_max_y" value="{{crop_max_y_val}}"></paper-input>
-    <paper-input label="crop_min_z" value="{{crop_min_z_val}}"></paper-input>
-    <paper-input label="crop_max_z" value="{{crop_max_z_val}}"></paper-input>
-    <paper-input label="horizontal_tolerance_degrees" value="{{horizontal_tolerance_degrees_val}}"></paper-input>
-    <paper-input label="cluster_distance" value="{{cluster_distance_val}}"></paper-input>
-    <paper-input label="min_cluster_size" value="{{min_cluster_size_val}}"></paper-input>
-    <paper-input label="max_cluster_size" value="{{max_cluster_size_val}}"></paper-input>
+    <paper-input class="normal input" label="crop_min_x"></paper-input>
+    <paper-input class="normal input" label="crop_max_x"></paper-input>
+    <paper-input class="normal input" label="crop_min_y"></paper-input>
+    <paper-input class="normal input" label="crop_max_y"></paper-input>
+    <paper-input class="normal input" label="crop_min_z"></paper-input>
+    <paper-input class="normal input" label="crop_max_z"></paper-input>
+    <paper-input class="normal input" label="horizontal_tolerance_degrees"></paper-input>
+    <paper-input class="normal input" label="cluster_distance"></paper-input>
+    <paper-input class="normal input" label="min_cluster_size"></paper-input>
+    <paper-input class="normal input" label="max_cluster_size"></paper-input>
   </template>
   <script>
     Polymer({
@@ -121,12 +54,24 @@
           console.error('Unable to call detection right now.');
           return;
         }
+
+        var paramLst = [];
+        var inputLst = Polymer.dom(this.root).querySelectorAll("paper-input");
+
+        for (i = 0; i < inputLst.length; i++) {
+          paramLst[paramLst.length] = {
+            name: "/rapid_pbd/" + inputLst[i].label,
+            value: inputLst[i].value
+          }
+        }
+
         var msg = {
           type: 'detect surface objects',
           program_info: {
             db_id: this.programId
           },
-          step_num: this.stepNum
+          step_num: this.stepNum,
+          param_list: paramLst
         };
         this.$.eventPub.publish(msg);
       },
