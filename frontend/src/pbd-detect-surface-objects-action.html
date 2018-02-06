@@ -24,16 +24,16 @@
 
     <p>Detected objects can be used as landmarks starting on the next step.</p>
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
-    <paper-input class="normal input" label="crop_min_x"></paper-input>
-    <paper-input class="normal input" label="crop_max_x"></paper-input>
-    <paper-input class="normal input" label="crop_min_y"></paper-input>
-    <paper-input class="normal input" label="crop_max_y"></paper-input>
-    <paper-input class="normal input" label="crop_min_z"></paper-input>
-    <paper-input class="normal input" label="crop_max_z"></paper-input>
-    <paper-input class="normal input" label="horizontal_tolerance_degrees"></paper-input>
-    <paper-input class="normal input" label="cluster_distance"></paper-input>
-    <paper-input class="normal input" label="min_cluster_size"></paper-input>
-    <paper-input class="normal input" label="max_cluster_size"></paper-input>
+    <paper-input class="normal input" label="crop_min_x" value="0.0" input_type="float"></paper-input>
+    <paper-input class="normal input" label="crop_max_x" value="1.5" input_type="float"></paper-input>
+    <paper-input class="normal input" label="crop_min_y" value="-0.5" input_type="float"></paper-input>
+    <paper-input class="normal input" label="crop_max_y" value="0.5" input_type="float"></paper-input>
+    <paper-input class="normal input" label="crop_min_z" value="0.05" input_type="float"></paper-input>
+    <paper-input class="normal input" label="crop_max_z" value="1.5" input_type="float"></paper-input>
+    <paper-input class="normal input" label="horizontal_tolerance_degrees" value="10.0" input_type="float"></paper-input>
+    <paper-input class="normal input" label="cluster_distance" value="0.025" input_type="float"></paper-input>
+    <paper-input class="normal input" label="min_cluster_size" value="300" input_type="int"></paper-input>
+    <paper-input class="normal input" label="max_cluster_size" value="2000" input_type="int"></paper-input>
   </template>
   <script>
     Polymer({
@@ -59,9 +59,21 @@
         var inputLst = Polymer.dom(this.root).querySelectorAll("paper-input");
 
         for (i = 0; i < inputLst.length; i++) {
+          var value = -1;
+          var type = inputLst[i].getAttribute("input_type");
+
+          if (type == "float") {
+            value = parseFloat(inputLst[i].value);
+          } else if (type == "int") {
+            value = parseInt(inputLst[i].value);
+          } else {
+            value = inputLst[i].value;
+          }
+
           paramLst[paramLst.length] = {
             name: "/rapid_pbd/" + inputLst[i].label,
-            value: parseFloat(inputLst[i].value)
+            value: value,
+            type: type
           }
         }
 

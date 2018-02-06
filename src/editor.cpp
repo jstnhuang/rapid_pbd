@@ -235,8 +235,14 @@ void Editor::ViewStep(const std::string& db_id, size_t step_id) {
 }
 
 void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id, const std::vector<msgs::DetectionParam>& param_list) {
-  for (size_t i = 0; i < param_list.size(); i++) {
-    ROS_INFO("Seeing %s with %f", param_list[i].name.c_str(), param_list[i].value);
+  for (size_t i = 0; i < param_list.size(); i++) { 
+    if (param_list[i].type == "int") {
+      int value = (int)param_list[i].value;
+      ros::param::set(param_list[i].name, value);
+    } else {
+      float value=(float)param_list[i].value;
+      ros::param::set(param_list[i].name, value);
+    }
   }
 
   msgs::SegmentSurfacesGoal goal;
