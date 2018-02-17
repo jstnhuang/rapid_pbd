@@ -30,43 +30,43 @@
     <paper-button class="normal" on-tap="_detect">Detect now</paper-button>
     <div>
       <p>crop_min_x</p>
-      <paper-slider class="normal" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_min_x" value="0.0" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="crop_min_x" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_min_x" value="0.0" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>crop_max_x</p>
-      <paper-slider class="normal" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_max_x" value="1.5" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="crop_max_x" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_max_x" value="1.5" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>crop_min_y</p>
-      <paper-slider class="normal" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_min_y" value="-0.5" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="crop_min_y" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_min_y" value="-0.5" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>crop_max_y</p>
-      <paper-slider class="normal" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_max_y" value="0.5" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="crop_max_y" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_max_y" value="0.5" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>crop_min_z</p>
-      <paper-slider class="normal" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_min_z" value="0.05" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="crop_min_z" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_min_z" value="0.05" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>crop_max_z</p>
-      <paper-slider class="normal" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_max_z" value="1.5" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="crop_max_z" pin max="10.0" min="-10.0" step="0.1" snaps name="crop_max_z" value="1.5" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>horizontal_tolerance_degrees</p>
-      <paper-slider class="normal" pin max="90.0" min="0.0" step="0.1" snaps name="horizontal_tolerance_degrees" value="10.0" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="horizontal_tolerance_degrees" pin max="90.0" min="0.0" step="0.1" snaps name="horizontal_tolerance_degrees" value="10.0" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>cluster_distance</p>
-      <paper-slider class="normal" pin max="1.0" min="0.0" step="0.001" snaps name="cluster_distance" value="0.025" input_type="float"></paper-slider>
+      <paper-slider class="normal" id="cluster_distance" pin max="1.0" min="0.0" step="0.001" snaps name="cluster_distance" value="0.025" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>min_cluster_size</p>
-      <paper-slider class="normal" pin max="10000" min="0" step="100" snaps name="min_cluster_size" value="300" input_type="int"></paper-slider>
+      <paper-slider class="normal" id="min_cluster_size" pin max="10000" min="0" step="100" snaps name="min_cluster_size" value="300" on-value-changed="_update_params"></paper-slider>
     </div>
     <div>
       <p>max_cluster_size</p>
-      <paper-slider class="normal" pin max="10000" min="0" step="100" snaps name="max_cluster_size" value="2000" input_type="int"></paper-slider>
+      <paper-slider class="normal" id="max_cluster_size" pin max="10000" min="0" step="100" snaps name="max_cluster_size" value="2000" on-value-changed="_update_params"></paper-slider>
     </div>
   </template>
   <script>
@@ -89,7 +89,18 @@
           return;
         }
 
-        var paramLst = [];
+        var msg = {
+          type: 'detect surface objects',
+          program_info: {
+            db_id: this.programId
+          },
+          step_num: this.stepNum,
+        };
+        this.$.eventPub.publish(msg);
+      },
+
+      _update_params: function() {
+        /*var paramLst = [];
         var inputLst = Polymer.dom(this.root).querySelectorAll("paper-slider");
 
         for (i = 0; i < inputLst.length; i++) {
@@ -110,14 +121,27 @@
             type: type
           }
         }
+        */
+        var input_params = {};
+        input_params.crop_min_x = parseFloat(this.$.crop_min_x.value);
+        input_params.crop_max_x = parseFloat(this.$.crop_max_x.value);
+        console.log("getting crop_max_x as " + this.$.crop_max_x.value);
+        input_params.crop_min_y = parseFloat(this.$.crop_min_y.value);
+        input_params.crop_max_y = parseFloat(this.$.crop_max_y.value);
+        input_params.crop_min_z = parseFloat(this.$.crop_min_z.value);
+        input_params.crop_max_z = parseFloat(this.$.crop_max_z.value);
+        input_params.horizontal_tolerance_degrees = parseFloat(this.$.horizontal_tolerance_degrees.value);
+        input_params.cluster_distance = parseFloat(this.$.cluster_distance.value);
+        input_params.min_cluster_size = parseInt(this.$.min_cluster_size.value);
+        input_params.max_cluster_size = parseInt(this.$.max_cluster_size.value);
 
         var msg = {
-          type: 'detect surface objects',
+          type: 'update surface perception parameters',
           program_info: {
             db_id: this.programId
           },
           step_num: this.stepNum,
-          param_list: paramLst
+          params: input_params
         };
         this.$.eventPub.publish(msg);
       },

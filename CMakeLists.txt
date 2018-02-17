@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   control_msgs
   geometry_msgs
+  hcr_common_markers
+  interactive_markers
   mongodb_store
   moveit_core
   moveit_msgs
@@ -147,6 +149,8 @@ catkin_package(
     actionlib
     control_msgs
     geometry_msgs
+    hcr_common_markers
+    interactive_markers
     mongodb_store
     moveit_core
     moveit_msgs

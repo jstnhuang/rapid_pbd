@@ -61,13 +61,15 @@ void Editor::HandleEvent(const msgs::EditorEvent& event) {
     } else if (event.type == msgs::EditorEvent::VIEW_STEP) {
       ViewStep(event.program_info.db_id, event.step_num);
     } else if (event.type == msgs::EditorEvent::DETECT_SURFACE_OBJECTS) {
-      DetectSurfaceObjects(event.program_info.db_id, event.step_num, event.param_list);
+      DetectSurfaceObjects(event.program_info.db_id, event.step_num);
     } else if (event.type == msgs::EditorEvent::GET_JOINT_VALUES) {
       GetJointValues(event.program_info.db_id, event.step_num, event.action_num,
                      event.action.actuator_group);
     } else if (event.type == msgs::EditorEvent::GET_POSE) {
       GetPose(event.program_info.db_id, event.step_num, event.action_num,
               event.action.actuator_group, event.action.landmark);
+    } else if (event.type == msgs::EditorEvent::UPDATE_SURFACE_PERCEPTION_PARAMETERS) {
+      UpdateSurfacePerceptionParameters(event.program_info.db_id, event.step_num, event.params);
     } else {
       ROS_ERROR("Unknown event type \"%s\"", event.type.c_str());
     }
@@ -131,6 +133,38 @@ void Editor::AddStep(const std::string& db_id) {
     return;
   }
   msgs::Step step;
+
+  // Initialize the stored parameters based on current ROS parameters
+  double crop_min_x, crop_max_x, crop_min_y, crop_max_y, crop_min_z, crop_max_z;
+  ros::param::get("crop_min_x", crop_min_x);
+  step.params.crop_min_x = crop_min_x;
+  ros::param::get("crop_max_x", crop_max_x);
+  ROS_INFO("Reading crop_max_x as %f", crop_max_x);
+  step.params.crop_max_x = crop_max_x;
+  ros::param::get("crop_min_y", crop_min_y);
+  step.params.crop_min_y = crop_min_y;
+  ros::param::get("crop_max_y", crop_max_y);
+  step.params.crop_max_y = crop_max_y;
+  ros::param::get("crop_min_z", crop_min_z);
+  step.params.crop_min_z = crop_min_z;
+  ros::param::get("crop_max_z", crop_max_z);
+  step.params.crop_max_z = crop_max_z;
+
+  double horizontal_tolerance_degrees, margin_above_surface, cluster_distance;
+  ros::param::get("horizontal_tolerance_degrees", horizontal_tolerance_degrees);
+  step.params.horizontal_tolerance_degrees = horizontal_tolerance_degrees;
+  ros::param::get("margin_above_surface", margin_above_surface);
+  ROS_INFO("Reading margin_above_surface %f", margin_above_surface);
+  step.params.margin_above_surface = margin_above_surface;
+  ros::param::get("cluster_distance", cluster_distance);
+  step.params.cluster_distance = cluster_distance;
+
+  int min_cluster_size, max_cluster_size;
+  ros::param::get("min_cluster_size", min_cluster_size);
+  step.params.min_cluster_size = min_cluster_size;
+  ros::param::get("max_cluster_size", max_cluster_size);
+  step.params.max_cluster_size = max_cluster_size;
+
   program.steps.push_back(step);
   Update(db_id, program);
 }
@@ -234,35 +268,14 @@ void Editor::ViewStep(const std::string& db_id, size_t step_id) {
   viz_.Publish(db_id, world);
 }
 
-void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id, const std::vector<msgs::DetectionParam>& param_list) {
-  for (size_t i = 0; i < param_list.size(); i++) { 
-    if (param_list[i].type == "int") {
-      int value = (int)param_list[i].value;
-      ros::param::set(param_list[i].name, value);
-    } else {
-      float value=(float)param_list[i].value;
-      ros::param::set(param_list[i].name, value);
-    }
-  }
-
-  msgs::SegmentSurfacesGoal goal;
-  goal.save_cloud = true;
-  action_clients_->surface_segmentation_client.sendGoal(goal);
-  bool success = action_clients_->surface_segmentation_client.waitForResult(
-      ros::Duration(10));
-  if (!success) {
-    ROS_ERROR("Failed to segment surface.");
-    return;
-  }
-  msgs::SegmentSurfacesResult::ConstPtr result =
-      action_clients_->surface_segmentation_client.getResult();
-
+void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id) {
   msgs::Program program;
-  success = db_.Get(db_id, &program);
+  bool success = db_.Get(db_id, &program);
   if (!success) {
     ROS_ERROR("Unable to update scene for program ID \"%s\"", db_id.c_str());
     return;
   }
+
   if (step_id >= program.steps.size()) {
     ROS_ERROR(
         "Unable to update scene for step %ld, program \"%s\", which has %ld "
@@ -270,6 +283,32 @@ void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id, cons
         step_id, db_id.c_str(), program.steps.size());
     return;
   }
+
+  msgs::Step step = program.steps[step_id];
+  ros::param::set("crop_min_x", step.params.crop_min_x);
+  ros::param::set("crop_max_x", step.params.crop_max_x);
+  ros::param::set("crop_min_y", step.params.crop_min_y);
+  ros::param::set("crop_max_y", step.params.crop_max_y);
+  ros::param::set("crop_min_z", step.params.crop_min_z);
+  ros::param::set("crop_max_z", step.params.crop_max_z);
+  ros::param::set("horizontal_tolerance_degrees", step.params.horizontal_tolerance_degrees);
+  ros::param::set("margin_above_surface", step.params.margin_above_surface);
+  ros::param::set("cluster_distance", step.params.cluster_distance);
+  ros::param::set("min_cluster_size", step.params.min_cluster_size);
+  ros::param::set("max_cluster_size", step.params.max_cluster_size);
+
+  msgs::SegmentSurfacesGoal goal;
+  goal.save_cloud = true;
+  action_clients_->surface_segmentation_client.sendGoal(goal);
+  success = action_clients_->surface_segmentation_client.waitForResult(
+      ros::Duration(10));
+  if (!success) {
+    ROS_ERROR("Failed to segment surface.");
+    return;
+  }
+  msgs::SegmentSurfacesResult::ConstPtr result =
+      action_clients_->surface_segmentation_client.getResult();
+ 
   DeleteScene(program.steps[step_id].scene_id);
   program.steps[step_id].scene_id = result->cloud_db_id;
   DeleteLandmarks(msgs::Landmark::SURFACE_BOX, &program.steps[step_id]);
@@ -278,6 +317,32 @@ void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id, cons
     ProcessSurfaceBox(result->landmarks[i], &landmark);
     program.steps[step_id].landmarks.push_back(landmark);
   }
+  Update(db_id, program);
+}
+
+void Editor::UpdateSurfacePerceptionParameters(const std::string& db_id, size_t step_id, const msgs::DetectionParams& params) {
+
+  ROS_INFO("Updates the parameters.");
+
+  msgs::Program program;
+  bool success = db_.Get(db_id, &program);
+  if (!success) {
+    ROS_ERROR("Unable to update surface perception parameters for program ID \"%s\"", db_id.c_str());
+    return;
+  }
+
+  program.steps[step_id].params.crop_min_x = params.crop_min_x;
+  program.steps[step_id].params.crop_max_x = params.crop_max_x;
+  program.steps[step_id].params.crop_min_y = params.crop_min_y;
+  program.steps[step_id].params.crop_max_y = params.crop_max_y;
+  program.steps[step_id].params.crop_min_z = params.crop_min_z;
+  program.steps[step_id].params.crop_max_z = params.crop_max_z;
+  program.steps[step_id].params.horizontal_tolerance_degrees = params.horizontal_tolerance_degrees;
+  //program.steps[step_id].params.margin_above_surface = params.margin_above_surface;
+  program.steps[step_id].params.cluster_distance = params.cluster_distance;
+  program.steps[step_id].params.min_cluster_size = params.min_cluster_size;
+  program.steps[step_id].params.max_cluster_size = params.max_cluster_size;
+ 
   Update(db_id, program);
 }
 

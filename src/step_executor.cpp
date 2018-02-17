@@ -56,6 +56,21 @@ void StepExecutor::Init() {
 }
 
 std::string StepExecutor::Start() {
+  ROS_INFO("Setting ROS parameters");
+  // Set the parameters for surfaces detection
+  ros::param::set("crop_min_x", step_.params.crop_min_x);
+  ros::param::set("crop_max_x", step_.params.crop_max_x);
+  ros::param::set("crop_min_y", step_.params.crop_min_y);
+  ros::param::set("crop_max_y", step_.params.crop_max_y);
+  ros::param::set("crop_min_z", step_.params.crop_min_z);
+  ros::param::set("crop_max_z", step_.params.crop_max_z);
+  ros::param::set("horizontal_tolerance_degrees", step_.params.horizontal_tolerance_degrees);
+  ros::param::set("margin_above_surface", step_.params.margin_above_surface);
+  ROS_INFO("Setting margin_above_surface as %f", step_.params.margin_above_surface);
+  ros::param::set("cluster_distance", step_.params.cluster_distance);
+  ros::param::set("min_cluster_size", step_.params.min_cluster_size);
+  ros::param::set("max_cluster_size", step_.params.max_cluster_size);
+
   motion_planning_.ClearGoals();
   std::string error("");
   for (size_t i = 0; i < step_.actions.size(); ++i) {

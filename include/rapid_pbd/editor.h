@@ -45,7 +45,7 @@ class Editor {
                  rapid_pbd_msgs::Action action);
   void DeleteAction(const std::string& db_id, size_t step_id, size_t action_id);
   void ViewStep(const std::string& db_id, size_t step_id);
-  void DetectSurfaceObjects(const std::string& db_id, size_t step_id, const std::vector<rapid_pbd_msgs::DetectionParam>& param_list);
+  void DetectSurfaceObjects(const std::string& db_id, size_t step_id);
   void GetJointValues(const std::string& db_id, size_t step_id,
                       size_t action_id, const std::string& actuator_group);
   // Pose actions
@@ -79,6 +79,7 @@ class Editor {
   void DeleteLandmarks(const std::string& landmark_type,
                        rapid_pbd_msgs::Step* step);
 
+  void UpdateSurfacePerceptionParameters(const std::string& db_id, size_t step_id, const rapid_pbd_msgs::DetectionParams& params);
   ProgramDb db_;
   SceneDb scene_db_;
   JointStateReader joint_state_reader_;
