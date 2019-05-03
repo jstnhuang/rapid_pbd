@@ -182,12 +182,10 @@ void SurfaceSegmentationAction::Execute(
     const SurfaceObjects& surface_scene = surface_objects[i];
     num_objects += surface_scene.objects.size();
 
-    if (i == 0) {
-      rapid_pbd_msgs::Surface surface;
-      surface.dimensions = surface_objects[i].surface.dimensions;
-      surface.pose_stamped = surface_objects[i].surface.pose_stamped;
-      result.surface = surface;
-    }
+    rapid_pbd_msgs::Surface surface;
+    surface.dimensions = surface_objects[i].surface.dimensions;
+    surface.pose_stamped = surface_objects[i].surface.pose_stamped;
+    result.surfaces.push_back(surface);
 
     for (size_t j = 0; j < surface_scene.objects.size(); ++j) {
       const Object& object = surface_scene.objects[j];
