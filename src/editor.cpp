@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <string>
+#include <sstream>
 #include <vector>
 
 #include "rapid_pbd_msgs/Action.h"
@@ -21,6 +22,7 @@
 #include "rapid_pbd/robot_config.h"
 #include "rapid_pbd/visualizer.h"
 #include "rapid_pbd/world.h"
+#include "rapid_pbd/motion_planning_constants.h"
 
 namespace msgs = rapid_pbd_msgs;
 namespace rapid {
@@ -267,6 +269,14 @@ void Editor::DetectSurfaceObjects(const std::string& db_id, size_t step_id) {
     msgs::Landmark landmark;
     ProcessSurfaceBox(result->landmarks[i], &landmark);
     program.steps[step_id].landmarks.push_back(landmark);
+  }
+  program.steps[step_id].surface_ids.clear();
+  for (size_t i = 0; i < result->surfaces.size(); i++) {
+    std::stringstream ss;
+    ss << kCollisionSurfaceName;
+    ss << i;
+    std::string obj_id = ss.str();
+    program.steps[step_id].surface_ids.push_back(obj_id);
   }
   Update(db_id, program);
 }
