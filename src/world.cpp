@@ -161,6 +161,15 @@ void GetWorld(const RobotConfig& robot_config, const msgs::Program& program,
     if (surface_boxes.size() > 0) {
       world->surface_box_landmarks = surface_boxes;
     }
+
+    std::vector<std::string> surface_ids;
+    for (size_t surface_id_i = 0; surface_id_i < step.surface_ids.size(); surface_id_i++) {
+      const std::string& surface_id = step.surface_ids[surface_id_i];
+      surface_ids.push_back(surface_id);
+    }
+    if (surface_ids.size() > 0) {
+      world->surface_ids = surface_ids;
+    }
   }
 }
 
