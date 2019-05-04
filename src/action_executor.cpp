@@ -1,6 +1,7 @@
 #include "rapid_pbd/action_executor.h"
 
 #include <string>
+#include <sstream>
 
 #include "actionlib/client/simple_action_client.h"
 #include "actionlib/server/simple_action_server.h"
@@ -156,10 +157,17 @@ bool ActionExecutor::IsDone(std::string* error) const {
           surface_shape.dimensions[0] = surfaces[i].dimensions.x;
           surface_shape.dimensions[1] = surfaces[i].dimensions.y;
           surface_shape.dimensions[2] = surfaces[i].dimensions.z;
-  
+
           moveit_msgs::CollisionObject surface_obj;
           surface_obj.header.frame_id = surfaces[i].pose_stamped.header.frame_id;
-          surface_obj.id = kCollisionSurfaceName;
+
+          std::stringstream ss;
+          ss << kCollisionSurfaceName;
+          ss << i;
+          std::string obj_id = ss.str();
+
+          world_->surface_ids.push_back(obj_id);
+          surface_obj.id = obj_id;
           surface_obj.primitives.push_back(surface_shape);
           surface_obj.primitive_poses.push_back(surfaces[i].pose_stamped.pose);
           surface_obj.operation = moveit_msgs::CollisionObject::ADD;
