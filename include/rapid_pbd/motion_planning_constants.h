@@ -4,7 +4,7 @@
 namespace rapid {
 namespace pbd {
 static const char kCollisionSurfaceName[] =
-    "surface_segmentation_collision_table";
+    "surface_segmentation_collision_surface";
 }
 }  // namespace rapid
 

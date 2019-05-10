@@ -1,4 +1,4 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+detect surface objects<link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -53,7 +53,7 @@
             <paper-item data-type="move to cartesian goal">Move to gripper pose</paper-item>
             <paper-item data-type="move to joint goal">Move to joint angles</paper-item>
             <paper-item data-type="move head">Move head</paper-item>
-            <paper-item data-type="detect tabletop objects">Detect tabletop objects</paper-item>
+            <paper-item data-type="detect surface objects">Detect surface objects</paper-item>
             <!--paper-item data-type="find custom landmark">Find custom landmark</paper-item-->
           </paper-listbox>
         </paper-dropdown-menu>
@@ -74,7 +74,7 @@
         <template is="dom-if" restamp if="[[_displayActionTypeIs(_displayActionType, 'move head')]]">
           <pbd-head-action action="{{action}}" params="[[params]]" ros="[[ros]]"></pbd-head-action>
         </template>
-        <template is="dom-if" restamp if="[[_displayActionTypeIs(_displayActionType, 'detect tabletop objects')]]">
+        <template is="dom-if" restamp if="[[_displayActionTypeIs(_displayActionType, 'detect surface objects')]]">
           <pbd-detect-surface-objects-action action="{{action}}" program-id="[[programId]]" step-num="[[stepNum]]" ros="[[ros]]"></pbd-detect-surface-objects-action>
         </template>
         <template is="dom-if" restamp if="[[_displayActionTypeIs(_displayActionType, 'find custom landmark')]]">
@@ -146,8 +146,8 @@
             actuator = this.action.actuator_group;
           }
           this._actionDescription = action + ' ' + actuator;
-        } else if (this.action.type === 'detect tabletop objects') {
-          this._actionDescription = 'Detect tabletop objects';
+        } else if (this.action.type === 'detect surface objects') {
+          this._actionDescription = 'Detect surface objects';
         } else if (this.action.type === 'find custom landmark') {
           this._actionDescription = 'Find custom landmark';
         }
