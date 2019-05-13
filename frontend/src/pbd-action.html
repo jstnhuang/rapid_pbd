@@ -1,4 +1,4 @@
-detect surface objects<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -53,7 +53,7 @@ detect surface objects<link rel="import" href="../bower_components/polymer/polym
             <paper-item data-type="move to cartesian goal">Move to gripper pose</paper-item>
             <paper-item data-type="move to joint goal">Move to joint angles</paper-item>
             <paper-item data-type="move head">Move head</paper-item>
-            <paper-item data-type="detect surface objects">Detect surface objects</paper-item>
+            <paper-item data-type="detect surface objects">Detect on-surface objects</paper-item>
             <!--paper-item data-type="find custom landmark">Find custom landmark</paper-item-->
           </paper-listbox>
         </paper-dropdown-menu>
@@ -147,7 +147,7 @@ detect surface objects<link rel="import" href="../bower_components/polymer/polym
           }
           this._actionDescription = action + ' ' + actuator;
         } else if (this.action.type === 'detect surface objects') {
-          this._actionDescription = 'Detect surface objects';
+          this._actionDescription = 'Detect on-surface objects';
         } else if (this.action.type === 'find custom landmark') {
           this._actionDescription = 'Find custom landmark';
         }
