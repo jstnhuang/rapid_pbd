@@ -71,7 +71,7 @@ bool ActionExecutor::IsValid(const Action& action) {
       PublishInvalidGroupError(action);
       return false;
     }
-  } else if (action.type == Action::DETECT_TABLETOP_OBJECTS) {
+  } else if (action.type == Action::DETECT_SURFACE_OBJECTS) {
   } else if (action.type == Action::FIND_CUSTOM_LANDMARK) {
   } else {
     ROS_ERROR("Invalid action type: \"%s\"", action.type.c_str());
@@ -110,8 +110,8 @@ std::string ActionExecutor::Start() {
     return motion_planning_->AddPoseGoal(action_.actuator_group, action_.pose,
                                          action_.landmark, joint_names,
                                          joint_positions);
-  } else if (action_.type == Action::DETECT_TABLETOP_OBJECTS) {
-    DetectTabletopObjects();
+  } else if (action_.type == Action::DETECT_SURFACE_OBJECTS) {
+    DetectSurfaceObjects();
   }
   return "";
 }
@@ -132,7 +132,7 @@ bool ActionExecutor::IsDone(std::string* error) const {
       // Arm motions are controlled by motion planning in the step executor.
       return true;
     }
-  } else if (action_.type == Action::DETECT_TABLETOP_OBJECTS) {
+  } else if (action_.type == Action::DETECT_SURFACE_OBJECTS) {
     bool done = clients_->surface_segmentation_client.getState().isDone();
     if (done) {
       msgs::SegmentSurfacesResultConstPtr result =
@@ -199,7 +199,7 @@ void ActionExecutor::Cancel() {
     } else {
       // Arm motions are cancelled by motion planning in the step executor.
     }
-  } else if (action_.type == Action::DETECT_TABLETOP_OBJECTS) {
+  } else if (action_.type == Action::DETECT_SURFACE_OBJECTS) {
     clients_->surface_segmentation_client.cancelAllGoals();
   }
 }
@@ -221,7 +221,7 @@ void ActionExecutor::ActuateGripper() {
   client->sendGoal(gripper_goal);
 }
 
-void ActionExecutor::DetectTabletopObjects() {
+void ActionExecutor::DetectSurfaceObjects() {
   rapid_pbd_msgs::SegmentSurfacesGoal goal;
   goal.save_cloud = false;
   clients_->surface_segmentation_client.sendGoal(goal);
