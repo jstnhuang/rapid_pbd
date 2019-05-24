@@ -188,17 +188,16 @@ void ProgramExecutionServer::Cancel(const std::string& error) {
 }
 
 void ProgramExecutionServer::Finish(const World& world) {
-  if (world.scene_id != "") {
-    for(size_t i = 0; i < world.surface_ids.size(); i++) {
-      moveit_msgs::CollisionObject surface;
-      surface.id = world.surface_ids[i];
-      surface.operation = moveit_msgs::CollisionObject::REMOVE;
+  // Remove all known collision surfaces
+  for(size_t i = 0; i < world.surface_ids.size(); i++) {
+    moveit_msgs::CollisionObject surface;
+    surface.id = world.surface_ids[i];
+    surface.operation = moveit_msgs::CollisionObject::REMOVE;
 
-      moveit_msgs::PlanningScene scene;
-      scene.world.collision_objects.push_back(surface);
-      scene.is_diff = true;
-      planning_scene_pub_.publish(scene);
-    }
+    moveit_msgs::PlanningScene scene;
+    scene.world.collision_objects.push_back(surface);
+    scene.is_diff = true;
+    planning_scene_pub_.publish(scene);
   }
 
   PublishIsRunning(false);

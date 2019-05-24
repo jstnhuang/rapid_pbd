@@ -149,6 +149,8 @@ bool ActionExecutor::IsDone(std::string* error) const {
         }
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
 
+        // For each detected surface, mark the surface as a collision object
+        // for the subsequent motion planning
         std::vector<msgs::Surface> surfaces = result->surfaces;
         for (size_t i = 0; i < surfaces.size(); ++i) {
           shape_msgs::SolidPrimitive surface_shape;
@@ -161,12 +163,14 @@ bool ActionExecutor::IsDone(std::string* error) const {
           moveit_msgs::CollisionObject surface_obj;
           surface_obj.header.frame_id = surfaces[i].pose_stamped.header.frame_id;
 
+          // Give each collision surface an id
           std::stringstream ss;
           ss << kCollisionSurfaceName;
           ss << i;
           std::string obj_id = ss.str();
-
+          // Store the collision surface id in world instance for later cleanup
           world_->surface_ids.push_back(obj_id);
+
           surface_obj.id = obj_id;
           surface_obj.primitives.push_back(surface_shape);
           surface_obj.primitive_poses.push_back(surfaces[i].pose_stamped.pose);

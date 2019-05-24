@@ -182,6 +182,7 @@ void SurfaceSegmentationAction::Execute(
     const SurfaceObjects& surface_scene = surface_objects[i];
     num_objects += surface_scene.objects.size();
 
+    // Add each surface into results for later collision avoidance
     rapid_pbd_msgs::Surface surface;
     surface.dimensions = surface_objects[i].surface.dimensions;
     surface.pose_stamped = surface_objects[i].surface.pose_stamped;

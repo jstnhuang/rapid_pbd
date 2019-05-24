@@ -1,8 +1,8 @@
 #include "rapid_pbd/editor.h"
 
 #include <exception>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "rapid_pbd_msgs/Action.h"
