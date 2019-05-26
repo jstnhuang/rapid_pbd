@@ -149,6 +149,16 @@ bool ActionExecutor::IsDone(std::string* error) const {
         }
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
 
+        // Clean up the existing collision surfaces in the world
+        for(size_t i = 0; i < world_->surface_ids.size(); i++) {
+          moveit_msgs::CollisionObject surface;
+          surface.id = world_->surface_ids[i];
+          surface.operation = moveit_msgs::CollisionObject::REMOVE;
+          motion_planning_->PublishCollisionObject(surface);
+        }
+        ROS_INFO("Removed %ld collision surfaces", world_->surface_ids.size());
+        world_->surface_ids.clear();
+
         // For each detected surface, mark the surface as a collision object
         // for the subsequent motion planning
         std::vector<msgs::Surface> surfaces = result->surfaces;
@@ -177,6 +187,7 @@ bool ActionExecutor::IsDone(std::string* error) const {
           surface_obj.operation = moveit_msgs::CollisionObject::ADD;
           motion_planning_->PublishCollisionObject(surface_obj);
         }
+        ROS_INFO("Added %ld collision surfaces", world_->surface_ids.size());
       } else {
         ROS_ERROR("Surface segmentation result pointer was null!");
         *error = "Surface segmentation result pointer was null!";

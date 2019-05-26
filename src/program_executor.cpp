@@ -199,6 +199,7 @@ void ProgramExecutionServer::Finish(const World& world) {
     scene.is_diff = true;
     planning_scene_pub_.publish(scene);
   }
+  ROS_INFO("Removed %ld collision surfaces", world.surface_ids.size());
 
   PublishIsRunning(false);
 }
