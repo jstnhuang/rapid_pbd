@@ -11,6 +11,7 @@
 #include "rapid_pbd/program_db.h"
 #include "rapid_pbd/runtime_robot_state.h"
 #include "rapid_pbd/visualizer.h"
+#include "rapid_pbd/world.h"
 
 namespace rapid {
 namespace pbd {
@@ -41,8 +42,9 @@ class ProgramExecutionServer {
   void PublishIsRunning(bool is_running);
   void Cancel(const std::string& error);
 
-  // Runs all necessary steps to finish up a program execution, regardless of whether it succeeded or failed.
-  void Finish();
+  // Runs all necessary steps to finish up a program execution, regardless of
+  // whether it succeeded or failed.
+  void Finish(const World& world = World());
 };
 }  // namespace pbd
 }  // namespace rapid

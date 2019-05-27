@@ -1,5 +1,6 @@
 #include "rapid_pbd/action_executor.h"
 
+#include <sstream>
 #include <string>
 
 #include "actionlib/client/simple_action_client.h"
@@ -70,7 +71,7 @@ bool ActionExecutor::IsValid(const Action& action) {
       PublishInvalidGroupError(action);
       return false;
     }
-  } else if (action.type == Action::DETECT_TABLETOP_OBJECTS) {
+  } else if (action.type == Action::DETECT_SURFACE_OBJECTS) {
   } else if (action.type == Action::FIND_CUSTOM_LANDMARK) {
   } else {
     ROS_ERROR("Invalid action type: \"%s\"", action.type.c_str());
@@ -109,8 +110,8 @@ std::string ActionExecutor::Start() {
     return motion_planning_->AddPoseGoal(action_.actuator_group, action_.pose,
                                          action_.landmark, joint_names,
                                          joint_positions);
-  } else if (action_.type == Action::DETECT_TABLETOP_OBJECTS) {
-    DetectTabletopObjects();
+  } else if (action_.type == Action::DETECT_SURFACE_OBJECTS) {
+    DetectSurfaceObjects();
   }
   return "";
 }
@@ -131,7 +132,7 @@ bool ActionExecutor::IsDone(std::string* error) const {
       // Arm motions are controlled by motion planning in the step executor.
       return true;
     }
-  } else if (action_.type == Action::DETECT_TABLETOP_OBJECTS) {
+  } else if (action_.type == Action::DETECT_SURFACE_OBJECTS) {
     bool done = clients_->surface_segmentation_client.getState().isDone();
     if (done) {
       msgs::SegmentSurfacesResultConstPtr result =
@@ -148,21 +149,46 @@ bool ActionExecutor::IsDone(std::string* error) const {
         }
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
 
-        msgs::Surface surface = result->surface;
-        shape_msgs::SolidPrimitive surface_shape;
-        surface_shape.type = shape_msgs::SolidPrimitive::BOX;
-        surface_shape.dimensions.resize(3);
-        surface_shape.dimensions[0] = surface.dimensions.x;
-        surface_shape.dimensions[1] = surface.dimensions.y;
-        surface_shape.dimensions[2] = surface.dimensions.z;
+        // Clean up the existing collision surfaces in the world
+        for (size_t i = 0; i < world_->surface_ids.size(); i++) {
+          moveit_msgs::CollisionObject surface;
+          surface.id = world_->surface_ids[i];
+          surface.operation = moveit_msgs::CollisionObject::REMOVE;
+          motion_planning_->PublishCollisionObject(surface);
+        }
+        ROS_INFO("Removed %ld collision surfaces", world_->surface_ids.size());
+        world_->surface_ids.clear();
 
-        moveit_msgs::CollisionObject surface_obj;
-        surface_obj.header.frame_id = surface.pose_stamped.header.frame_id;
-        surface_obj.id = kCollisionSurfaceName;
-        surface_obj.primitives.push_back(surface_shape);
-        surface_obj.primitive_poses.push_back(surface.pose_stamped.pose);
-        surface_obj.operation = moveit_msgs::CollisionObject::ADD;
-        motion_planning_->PublishCollisionObject(surface_obj);
+        // For each detected surface, mark the surface as a collision object
+        // for the subsequent motion planning
+        std::vector<msgs::Surface> surfaces = result->surfaces;
+        for (size_t i = 0; i < surfaces.size(); ++i) {
+          shape_msgs::SolidPrimitive surface_shape;
+          surface_shape.type = shape_msgs::SolidPrimitive::BOX;
+          surface_shape.dimensions.resize(3);
+          surface_shape.dimensions[0] = surfaces[i].dimensions.x;
+          surface_shape.dimensions[1] = surfaces[i].dimensions.y;
+          surface_shape.dimensions[2] = surfaces[i].dimensions.z;
+
+          moveit_msgs::CollisionObject surface_obj;
+          surface_obj.header.frame_id =
+              surfaces[i].pose_stamped.header.frame_id;
+
+          // Give each collision surface an id
+          std::stringstream ss;
+          ss << kCollisionSurfaceName;
+          ss << i;
+          std::string obj_id = ss.str();
+          // Store the collision surface id in world instance for later cleanup
+          world_->surface_ids.push_back(obj_id);
+
+          surface_obj.id = obj_id;
+          surface_obj.primitives.push_back(surface_shape);
+          surface_obj.primitive_poses.push_back(surfaces[i].pose_stamped.pose);
+          surface_obj.operation = moveit_msgs::CollisionObject::ADD;
+          motion_planning_->PublishCollisionObject(surface_obj);
+        }
+        ROS_INFO("Added %ld collision surfaces", world_->surface_ids.size());
       } else {
         ROS_ERROR("Surface segmentation result pointer was null!");
         *error = "Surface segmentation result pointer was null!";
@@ -189,7 +215,7 @@ void ActionExecutor::Cancel() {
     } else {
       // Arm motions are cancelled by motion planning in the step executor.
     }
-  } else if (action_.type == Action::DETECT_TABLETOP_OBJECTS) {
+  } else if (action_.type == Action::DETECT_SURFACE_OBJECTS) {
     clients_->surface_segmentation_client.cancelAllGoals();
   }
 }
@@ -211,7 +237,7 @@ void ActionExecutor::ActuateGripper() {
   client->sendGoal(gripper_goal);
 }
 
-void ActionExecutor::DetectTabletopObjects() {
+void ActionExecutor::DetectSurfaceObjects() {
   rapid_pbd_msgs::SegmentSurfacesGoal goal;
   goal.save_cloud = false;
   clients_->surface_segmentation_client.sendGoal(goal);

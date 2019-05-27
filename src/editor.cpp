@@ -205,7 +205,7 @@ void Editor::DeleteAction(const std::string& db_id, size_t step_id,
 
   // Clean up the scene and landmarks
   const msgs::Action& action = step->actions[action_id];
-  if (action.type == msgs::Action::DETECT_TABLETOP_OBJECTS) {
+  if (action.type == msgs::Action::DETECT_SURFACE_OBJECTS) {
     DeleteScene(step->scene_id);
     step->scene_id = "";
     DeleteLandmarks(msgs::Landmark::SURFACE_BOX, step);

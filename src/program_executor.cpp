@@ -131,7 +131,7 @@ void ProgramExecutionServer::Execute(
     if (error != "") {
       executors[i]->Cancel();
       Cancel(error);
-      Finish();
+      Finish(world);
       ros::spinOnce();
       return;
     }
@@ -140,14 +140,14 @@ void ProgramExecutionServer::Execute(
         executors[i]->Cancel();
         std::string msg("Program \"" + program.name + "\" was preempted.");
         Cancel(msg);
-        Finish();
+        Finish(world);
         ros::spinOnce();
         return;
       }
       if (error != "") {
         executors[i]->Cancel();
         Cancel(error);
-        Finish();
+        Finish(world);
         ros::spinOnce();
         return;
       }
@@ -155,13 +155,13 @@ void ProgramExecutionServer::Execute(
     }
     if (error != "") {
       Cancel(error);
-      Finish();
+      Finish(world);
       ros::spinOnce();
       return;
     }
   }
 
-  Finish();
+  Finish(world);
   server_.setSucceeded();
 }
 
@@ -187,15 +187,19 @@ void ProgramExecutionServer::Cancel(const std::string& error) {
   server_.setAborted(result, error);
 }
 
-void ProgramExecutionServer::Finish() {
-  moveit_msgs::CollisionObject surface;
-  surface.id = kCollisionSurfaceName;
-  surface.operation = moveit_msgs::CollisionObject::REMOVE;
+void ProgramExecutionServer::Finish(const World& world) {
+  // Remove all known collision surfaces
+  for (size_t i = 0; i < world.surface_ids.size(); i++) {
+    moveit_msgs::CollisionObject surface;
+    surface.id = world.surface_ids[i];
+    surface.operation = moveit_msgs::CollisionObject::REMOVE;
 
-  moveit_msgs::PlanningScene scene;
-  scene.world.collision_objects.push_back(surface);
-  scene.is_diff = true;
-  planning_scene_pub_.publish(scene);
+    moveit_msgs::PlanningScene scene;
+    scene.world.collision_objects.push_back(surface);
+    scene.is_diff = true;
+    planning_scene_pub_.publish(scene);
+  }
+  ROS_INFO("Removed %ld collision surfaces", world.surface_ids.size());
 
   PublishIsRunning(false);
 }
