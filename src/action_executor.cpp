@@ -1,7 +1,7 @@
 #include "rapid_pbd/action_executor.h"
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "actionlib/client/simple_action_client.h"
 #include "actionlib/server/simple_action_server.h"
@@ -150,7 +150,7 @@ bool ActionExecutor::IsDone(std::string* error) const {
         runtime_viz_.PublishSurfaceBoxes(world_->surface_box_landmarks);
 
         // Clean up the existing collision surfaces in the world
-        for(size_t i = 0; i < world_->surface_ids.size(); i++) {
+        for (size_t i = 0; i < world_->surface_ids.size(); i++) {
           moveit_msgs::CollisionObject surface;
           surface.id = world_->surface_ids[i];
           surface.operation = moveit_msgs::CollisionObject::REMOVE;
@@ -171,7 +171,8 @@ bool ActionExecutor::IsDone(std::string* error) const {
           surface_shape.dimensions[2] = surfaces[i].dimensions.z;
 
           moveit_msgs::CollisionObject surface_obj;
-          surface_obj.header.frame_id = surfaces[i].pose_stamped.header.frame_id;
+          surface_obj.header.frame_id =
+              surfaces[i].pose_stamped.header.frame_id;
 
           // Give each collision surface an id
           std::stringstream ss;

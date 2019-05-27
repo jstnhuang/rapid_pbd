@@ -42,8 +42,9 @@ class ProgramExecutionServer {
   void PublishIsRunning(bool is_running);
   void Cancel(const std::string& error);
 
-  // Runs all necessary steps to finish up a program execution, regardless of whether it succeeded or failed.
-  void Finish(const World& world=World());
+  // Runs all necessary steps to finish up a program execution, regardless of
+  // whether it succeeded or failed.
+  void Finish(const World& world = World());
 };
 }  // namespace pbd
 }  // namespace rapid

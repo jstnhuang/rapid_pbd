@@ -129,7 +129,8 @@ void SurfaceSegmentationAction::Execute(
     vox.setInputCloud(cloud);
     vox.setIndices(point_indices);
     float leaf_size = 0.01;
-    ros::param::param<float>("surface_segmentation/vox_leaf_size", leaf_size, 0.01);
+    ros::param::param<float>("surface_segmentation/vox_leaf_size", leaf_size,
+                             0.01);
     vox.setLeafSize(leaf_size, leaf_size, leaf_size);
     vox.filter(*downsampled_cloud);
     sensor_msgs::PointCloud2 downsampled_cloud_msg;
@@ -141,17 +142,23 @@ void SurfaceSegmentationAction::Execute(
   ros::param::param("surface_segmentation/horizontal_tolerance_degrees",
                     horizontal_tolerance_degrees, 10.0);
   double margin_above_surface;
-  ros::param::param("surface_segmentation/margin_above_surface", margin_above_surface, 0.015);
+  ros::param::param("surface_segmentation/margin_above_surface",
+                    margin_above_surface, 0.015);
   double cluster_distance;
-  ros::param::param("surface_segmentation/cluster_distance", cluster_distance, 0.025);
+  ros::param::param("surface_segmentation/cluster_distance", cluster_distance,
+                    0.025);
   int min_cluster_size;
-  ros::param::param("surface_segmentation/min_cluster_size", min_cluster_size, 300);
+  ros::param::param("surface_segmentation/min_cluster_size", min_cluster_size,
+                    300);
   int max_cluster_size;
-  ros::param::param("surface_segmentation/max_cluster_size", max_cluster_size, 10000);
+  ros::param::param("surface_segmentation/max_cluster_size", max_cluster_size,
+                    10000);
   int min_surface_size;
-  ros::param::param("surface_segmentation/min_surface_size", min_surface_size, 8000);
+  ros::param::param("surface_segmentation/min_surface_size", min_surface_size,
+                    8000);
   double max_point_distance;
-  ros::param::param("surface_segmentation/max_point_distance", max_point_distance, 0.01);
+  ros::param::param("surface_segmentation/max_point_distance",
+                    max_point_distance, 0.01);
 
   surface_perception::Segmentation seg;
   seg.set_input_cloud(cloud);

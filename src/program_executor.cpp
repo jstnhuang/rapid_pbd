@@ -189,7 +189,7 @@ void ProgramExecutionServer::Cancel(const std::string& error) {
 
 void ProgramExecutionServer::Finish(const World& world) {
   // Remove all known collision surfaces
-  for(size_t i = 0; i < world.surface_ids.size(); i++) {
+  for (size_t i = 0; i < world.surface_ids.size(); i++) {
     moveit_msgs::CollisionObject surface;
     surface.id = world.surface_ids[i];
     surface.operation = moveit_msgs::CollisionObject::REMOVE;
